@@ -20,7 +20,7 @@ open groups), search groups,, join an open group, make a request to join a
 closed group and exit a group.
 ◦ Admin should be able to suspend me
 
-## Task 3 (adbullahi)
+## Task 3 (11 -14 ) (adbullahi)
 ◦ Members of the group should be able to make a post, add attachments to the
 post, comment on a post and reply on a comment.
 ◦ Members should be able to like posts, comments and replies.
