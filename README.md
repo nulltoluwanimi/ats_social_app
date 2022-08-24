@@ -22,7 +22,7 @@ closed group and exit a group.
 
 ## Task 3 (11 -14 ) (adbullahi)
 ◦ Members of the group should be able to make a post, add attachments to the
-post, comment on a post and reply on a comment.
+post, comment on a post and reply on a comment. ( check markdown or richtext)
 ◦ Members should be able to like posts, comments and replies.
 ◦ Posts can have a title (optional).
 ◦ An admin should be able to hide a post or comment or reply from view.
