@@ -14,18 +14,19 @@ Accounts (Users), Groups, Posts, M2M(Likes, comments, replies), FK(notifications
 ## Task 2 (6,7,8,9 10) (Tolu )
 - An admin can make other members of the group an admin (A group should
 have a minimum of one admin and maximum of 3 admins)
-◦ An admin can remove members of the group
-◦ Users should be able to view groups list (differentiate between closed and
+- An admin can remove members of the group
+- Users should be able to view groups list (differentiate between closed and
 open groups), search groups,, join an open group, make a request to join a
 closed group and exit a group.
-◦ Admin should be able to suspend me
+- Admin should be able to suspend me
 
 ## Task 3 (11 -14 ) (adbullahi)
-◦ Members of the group should be able to make a post, add attachments to the
-post, comment on a post and reply on a comment. ( check markdown or richtext)
-◦ Members should be able to like posts, comments and replies.
-◦ Posts can have a title (optional).
-◦ An admin should be able to hide a post or comment or reply from view.
+- Members of the group should be able to make a post, add attachments to the
+post, comment on a post and reply on a comment. 
+ -( check markdown or richtext)
+- Members should be able to like posts, comments and replies.
+- Posts can have a title (optional).
+- An admin should be able to hide a post or comment or reply from view.
 
 
 
