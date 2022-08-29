@@ -14,13 +14,23 @@ class InactiveManager(models.Manager):
     
     def get_queryset(self):
         return super().get_queryset().filter(is_active=False)
+    
+class SuspendedMember(models.Manager):
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(is_suspended=True)
+    
+class NotSuspendedMember(models.Manager):
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(is_suspended=False)
 
 
 
 class Groups(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="group_creator")
     name_of_group = models.CharField(max_length=500, null=True)
-    picture = models.ImageField(null=True, upload_to="group_images")
+    picture = models.ImageField(null=True, upload_to="group_images", blank=True)
     title = models.CharField(max_length=50, null=True)
     description = models.TextField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -32,11 +42,26 @@ class Groups(models.Model):
     active_objects = ActiveManager()
     inactive_objects = InactiveManager()
     
+
+class GroupRequest(models.Manager):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE)
+    request_message = models.TextField()
+    time_stamp = models.DateTimeField(auto_now_add=True)
+    
 class Members(models.Model):
     group = models.ForeignKey(Groups, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    
+    
+    objects = models.Manager()
+    active_objects = ActiveManager()
+    inactive_objects = InactiveManager()
+    suspended_objects = SuspendedMember()
+    not_suspended_objects = NotSuspendedMember()
     
 
 
