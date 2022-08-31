@@ -53,9 +53,15 @@ class Groups(models.Model):
 
 
 class GroupRequest(models.Manager):
+    STATUS_CHOICES = (
+        ("ACCEPTED", "ACCEPTED"),
+        ("REJECTED", "REJECTED"),
+        ("INITIATED", "INITIATED"),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE)
     request_message = models.TextField()
+    status = models.CharField(choices=STATUS_CHOICES, max_length=15, null=True, default="INITIATED")
     time_stamp = models.DateTimeField(auto_now_add=True)
 
 
