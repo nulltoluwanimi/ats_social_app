@@ -1,0 +1,17 @@
+{% if messages %}
+<ul class="messages my-4 rounded-sm">
+    {% for message in messages %}
+    <li {% if message.tags == 'error' %} 
+        class="{{ message.tags }} bg-red-200 p-2 text-grey-200 font-bold border  border-rose-900 tracking-tight "
+        {% elif message.tags == 'success' %} 
+        class="{{ message.tags }} bg-green-200 p-2 text-grey-200 font-bold border border-teal-900 tracking-tight "
+        {% elif message.tags == 'info' %} 
+        class="{{ message.tags }} bg-blue-200 p-2 text-grey-200 font-bold border border-cyan-900 tracking-tight "
+
+        {% endif %}>
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
+        {{ message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
