@@ -1,0 +1,12 @@
+<!-- template/registration/login.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>LogIn</h2>
+<form method="POST" action="">
+    {% csrf_token %}
+    {% for field in form %}
+        {{ field }}
+    {% endfor %}
+    <button class="btn btn-outline-warning outline-warning" value="submit" type="Submit">Log In</button>
+</form>
+{% endblock %}
