@@ -39,8 +39,8 @@ def sign_up(request):
 
 
 def user_sign_in(request):
-    email = request.method.get("email")
-    password = request.method.get("password")
+    email = request.POST.get("email")
+    password = request.POST.get("password")
     
     try:
         user = User.objects.get(email=email.lower())

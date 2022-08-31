@@ -6,9 +6,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class User(AbstractUser):
-    first_name = models.CharField(max_length=20, null=True, blank=True)
-    middle_name = models.CharField(max_length=20, blank=True, null=True)
-    last_name = models.CharField(max_length=20, null=True, blank=True)
+    full_name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=20, unique=True)
     date_of_birth = models.DateField(null=True, blank=True)

@@ -1,4 +1,3 @@
-from curses.ascii import HT
 from django.shortcuts import render
 from django.contrib import messages
 from django.db.models import Q
@@ -8,6 +7,7 @@ from django.http import HttpResponseRedirect
 from accounts.models import User
 from .models import Groups, Posts, Members, Likes, Replies, GroupRequest
 from .forms import GroupCreateForm
+from activities.models import Notification
 # Create your views here.
 
 
@@ -86,7 +86,7 @@ def join_group(request, pk, id):
         request = GroupRequest.objects.create(
             user=new_member,
             group=group
-            request_message=f"{new_member.username} wants to join '{group.title}'"
+            request_message=f"{new_member.username} wants to join {group.title}"
         )
         
         request.save()
