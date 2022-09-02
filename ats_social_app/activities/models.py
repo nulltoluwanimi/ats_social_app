@@ -2,7 +2,7 @@ from email.policy import default
 from django.db import models
 
 from accounts.models import User
-from groups.models import Groups, SuspendedMember, NotSuspendedMember
+from groups.models import Group, SuspendedMember, NotSuspendedMember
 
 # Create your models here.
 
@@ -28,8 +28,8 @@ def _json_list():
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
+    user = models.ManyToManyField(User, null=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     content = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
     is_admin_notification = models.BooleanField(default=True)
@@ -37,7 +37,7 @@ class Notification(models.Model):
 
 class Event(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
     description = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
@@ -56,7 +56,7 @@ class Event(models.Model):
 
 class Poll(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=90, null=True)
     start_date = models.DateTimeField()
     stop_date = models.DateTimeField()

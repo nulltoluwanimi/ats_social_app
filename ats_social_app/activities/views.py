@@ -31,7 +31,7 @@ def create_event(request, pk, id):
             event.save()
             
             notification =  Notification.objects.create(
-                user=User.objects.get(id=pk),
+                user=event.group.members_set.filter(is_admin_notification=True),
                 group= Group.objects.get(id=id),
                 content=request.POST["title"]
             
@@ -52,12 +52,14 @@ def create_event(request, pk, id):
 def edit_event(request, pk, id, _id):
     event = Event.running_objects.get(id=_id)
     form = EventCreateForm(instance=event)
-    
+
     if request.method == "POST":
         form = EventCreateForm( request.POST, request.FILES, instance=event)
         
         if form.is_valid():
             form.save()
+
+            
             
             return
     

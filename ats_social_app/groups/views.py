@@ -31,7 +31,7 @@ def home(request):
 @login_required(login_url="accounts:sign_in")
 def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
-    member = Members.active_objects.get(user_id=pk, group_id=id)
+    member = Members.not_suspended_objects.get(user_id=pk, group_id=id)
     posts = Posts.objects.filter(group=group)
 
     if member is not None:
@@ -49,7 +49,6 @@ def group_details(request, pk, id):
         }
 
         return render(request, "", context)
-
     post_form = PostForm(request.POST)
 
     if post_form.is_valid():
@@ -57,6 +56,13 @@ def group_details(request, pk, id):
         post.member = member
         post.group = group
         post.save()
+
+        notification = Notification.objects.create(
+            group=group,
+            content=f"{member.user.username} created a post group",
+            user=group.members_set.filter()
+        )
+        notification.save()
 
         return HttpResponseRedirect(reverse())
 
@@ -182,6 +188,14 @@ def join_group(request, pk, id):
         )
 
         request.save()
+
+        notification = Notification.objects.create(
+            group=group,
+            content=f"{new_member.user.username} left the group",
+            user=group.members_set.filter(is_admin=True),
+            is_admin_notification=True,
+        )
+        notification.save()
         messages.success(
             request, "A request has been sent to the Admin of the group")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -200,6 +214,16 @@ def exit_group(request, pk, id):
     member = Members.active_objects.get(user_id=pk, group_id=id)
     member.is_active = False
     member.save()
+
+    group = Group.active_objects.get(id=id)
+
+    notification = Notification.objects.create(
+            group=group,
+            content=f"{member.user.username} left the group",
+            user=group.members_set.filter(is_admin_notification=True),
+            is_admin_notification=True
+    )
+    notification.save()
     return HttpResponseRedirect(reverse("groups:home"))
 
 
