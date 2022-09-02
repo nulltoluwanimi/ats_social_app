@@ -1,7 +1,10 @@
+from re import T
 from django.db import models
 
 from django.contrib.auth import get_user_model
 from django_ckeditor_5.fields import CKEditor5Field
+
+from accounts.models import User
 User = get_user_model()
 
 
@@ -29,7 +32,7 @@ class NotSuspendedMember(models.Manager):
         return super().get_queryset().filter(is_suspended=False)
 
 
-class Groups(models.Model):
+class Group(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="group_creator")
     name_of_group = models.CharField(max_length=500, null=True)
@@ -60,7 +63,7 @@ class GroupRequest(models.Manager):
         ("INITIATED", "INITIATED"),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     request_message = models.TextField()
     status = models.CharField(choices=STATUS_CHOICES,
                               max_length=15, null=True, default="INITIATED")
@@ -68,7 +71,7 @@ class GroupRequest(models.Manager):
 
 
 class Members(models.Model):
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
@@ -90,8 +93,8 @@ class Members(models.Model):
 
 class Posts(models.Model):
     member = models.ForeignKey(Members, on_delete=models.SET_NULL, null=True)
-    group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
-    title = models.CharField(max_length=50, null=True)
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+    title = models.CharField(max_length=50, null=True, blank=True, default=group.name)
     body = CKEditor5Field('body', config_name="extends")
     image = models.ImageField(blank=True, upload_to="post_images", null=True)
     additional_files = models.FileField(
@@ -142,6 +145,7 @@ class Replies(models.Model):
 
 class Likes(models.Model):
     member = models.ForeignKey(Members, on_delete=models.SET_NULL, null=True)
+    post = models.ForeignKey(Posts, on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.ForeignKey(
         Comments, blank=True, null=True, on_delete=models.SET_NULL)
     reply = models.ForeignKey(

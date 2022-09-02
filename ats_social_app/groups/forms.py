@@ -1,12 +1,13 @@
+from dataclasses import field
 from django import forms
 
-from .models import Groups, Posts
+from .models import Group, Posts, Comments, Replies
 from django_ckeditor_5.widgets import CKEditor5Widget
 
 
 class GroupCreateForm(forms.ModelForm):
     class Meta:
-        model = Groups
+        model = Group
         exclude = ("owner", "date_created",
                    "is_active", 'picture')
 
@@ -28,3 +29,15 @@ class PostForm(forms.ModelForm):
                 attrs={"class": "django_ckeditor_5", "value": f"body"}, config_name="extends"
             )
         }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comments
+        field = ("content",)
+        
+
+class ReplyForm(forms.ModelForm):
+    class Meta:
+        model = Replies
+        field = ("content",) 

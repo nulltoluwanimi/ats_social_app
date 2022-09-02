@@ -17,8 +17,6 @@ User = get_user_model()
 # Create your views here.
 
 
-def home(request):
-    return render(request, 'home.html')
 
 
 def sign_up(request):

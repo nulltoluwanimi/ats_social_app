@@ -1,14 +1,14 @@
-import re
+
 from django import forms
 
 from activities.views import polls_option1
 
-from .models import Events
+from .models import Event
 
 
 class EventCreateForm(forms.ModelForm):
     class Meta:
-        model = Events
+        model = Event
         exclude = ("date_created", "yes", "no", "maybe", "creator", "group")
 
 

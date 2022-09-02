@@ -7,13 +7,13 @@ from groups.models import Groups, SuspendedMember, NotSuspendedMember
 # Create your models here.
 
 
-class StartedEvents(models.Manager):
+class StartedEvent(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().filter(is_started=True)
 
 
-class NotStartedEvents(models.Manager):
+class NotStartedEvent(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().filter(is_started=False)
@@ -35,7 +35,7 @@ class Notification(models.Model):
     is_admin_notification = models.BooleanField(default=True)
 
 
-class Events(models.Model):
+class Event(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200)
@@ -50,15 +50,15 @@ class Events(models.Model):
     maybe = models.JSONField(default=_json_list(), null=True, blank=True)
 
     objects = models.Manager()
-    started_objects = StartedEvents()
-    running_objects = NotStartedEvents()
+    started_objects = StartedEvent()
+    running_objects = NotStartedEvent()
 
 
-class Polls(models.Model):
+class Poll(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=90, null=True)
     start_date = models.DateTimeField()
     stop_date = models.DateTimeField()
-    polls_option = models.JSONField(
+    poll_option = models.JSONField(
         default=_json(), help_text="Maximum of 4 Options")
