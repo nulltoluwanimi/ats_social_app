@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>For Beam Groups</title>
+    {% comment %} <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css"
+      integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/js/all.min.js"
+      integrity="sha512-8pHNiqTlsrRjVD4A/3va++W1sMbUHwWxxRPWNyVlql3T+Hgfd81Qc6FC5WMXDC+tSauxxzp1tgiAvSKFu1qIlA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" {% endcomment %}
+    {% comment %} ></script> {% endcomment %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+{% comment %} @font-face {
+    font-family: 'IBMPlexSans';
+    src: url() format('truetype');
+  }
+  
+  @font-face {
+    font-family: 'IBMPlexSansLight';
+    src: url(/src/assets/fonts/IBMPlexSans-Regular.ttf) format('truetype');
+  } {% endcomment %}
+  body{
+    font-family: 'Fira Sans', sans-serif;
+  }
+  .aside__dropdownUpArrow {
+    transition: all 0.3s ease-in-out;
+    transform: rotate(180deg);
+  }
+  .aside__showDropdown {
+    display: block;
+  }
+  .aside__dropdown ul {
+    display: none;
+  }
+  
+    </style>
+
+
+  </head>
+  <body class="bg-gray-200">
+    <header class="bg-white sticky top-0">
+      <nav class="flex justify-between items-center py-2 px-4 space-x-8">
+        <div class="flex">
+            <img class="mx-auto h-12 w-auto" src="{% static 'icons/sunrays.png' %}" alt="icons" />
+
+        </div>
+        <div
+          class="flex border-2 rounded-lg justify-center items-center h-fit bg-gray-200 px-4 w-1/2"
+        >
+          <!-- Search Icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+
+          <input
+            type="search"
+            name=""
+            id=""
+            class="w-full bg-transparent py-1 px-5 border-2 border-none focus:ring-0 focus:outline-none"
+            placeholder="Search For Beam Groups"
+          />
+        </div>
+        <div class="flex space-x-2 items-center">
+            {% if not user.is_authenticated %}
+            <a href="{% url 'accounts:sign_in'%}">
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0"
+          >
+           Sing In 
+          </button></a>
+          {% else %}
+          <div class="relative">
+          <a href={% url 'accounts:edit_details' request.user.id  %}> 
+            {% if  not user.is_authenticated %}
+         
+             <img class="w-10 h-10 rounded-full" src="{% static 'icons/bear.png' %}" alt="">
+            <span class="top-0 left-7 absolute  w-3.5 h-3.5 bg-red-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+
+             {% else %}
+             <div class="flex gap-4 ">
+             <a href="{% url 'accounts:sign_out'%}">
+                <button
+                  class="bg-blue-500 mt-2 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0"
+                >
+                 Logout
+                </button></a>
+                <img class="w-10 h-10 rounded-full" src="{{ user.profile_picture.url }}" alt="">
+            <span class="top-0 left-7 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+
+             </div>
+                {% endif %}
+            </a>
+        </div>
+          {% endif%}
+        </div>
+      </nav>
+    </header>
+    <div class="flex">
+      <aside
+        class="w-1/4 max-w-1/4 bg-white h-[calc(100vh-52px)] flex flex-col text-gray-700 sticky top-[52px] space-y-4"
+      >
+        <div class="space-y-4 pb-4 h-full flex-1 overflow-y-scroll px-2 mt-6">
+          <div class="space-y-2">
+            <p class="text-[10px] capitalize">FEEDS</p>
+            <div class="text-[14px] font-sans text-gray-800 space-y-2">
+              <div>
+                <p>HOME</p>
+              </div>
+              <div>
+                <p>Popular</p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-[15px] font-bold capitalize">RECENT COMMUNITIES</p>
+            <div class="text-[14px] font-light text-black space-y-2">
+             {% for group in recently_created_groups %}
+             <div>
+                <p>{{forloop.counter}}- b/{{group.name_of_group}}</p>
+              </div>
+              {% endfor %}
+              <div class="mt-6 underline ">
+                <p>Create Community</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-[10px] capitalize">Explore</p>
+            <div class="text-[18px] text-gray-800 space-y-4 cursor-pointer">
+              <div class="aside__dropdown" data-index="1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-laptop"></i>
+                    <p>Gaming</p>
+                  </div>
+                  <div class="arrow-down">
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </div>
+                </div>
+                <ul class="text-[14px] font-light pl-4 space-y-4 mt-4">
+                  <li>
+                    <p>Megan Anderson,</p>
+                  </li>
+                  <li>
+                    <p>NBA,</p>
+                  </li>
+                  <li>
+                    <p>NFL,</p>
+                  </li>
+                  <li>
+                    <p>Atlanta Hawks,</p>
+                  </li>
+                  <li>
+                    <p>Los Angeles Lakers,</p>
+                  </li>
+                  <li>
+                    <p>Boston Celtics,</p>
+                  </li>
+                  <li>
+                    <p>Arsenal F.C.,</p>
+                  </li>
+                  <li>
+                    <p>Philadelphia 76ers,</p>
+                  </li>
+                  <li>
+                    <p>Premier League,</p>
+                  </li>
+                  <li>
+                    <p>UFC,</p>
+                  </li>
+                </ul>
+              </div>
+              <div class="aside__dropdown font-light" data-index="2">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-laptop"></i>
+                    <p>Sports</p>
+                  </div>
+                  <div class="arrow-down">
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </div>
+                </div>
+                <ul class="text-[14px] font-light pl-4 space-y-4">
+                  <li>
+                    <p>Megan Anderson,</p>
+                  </li>
+                  <li>
+                    <p>NBA,</p>
+                  </li>
+                  <li>
+                    <p>NFL,</p>
+                  </li>
+                  <li>
+                    <p>Atlanta Hawks,</p>
+                  </li>
+                  <li>
+                    <p>Los Angeles Lakers,</p>
+                  </li>
+                  <li>
+                    <p>Boston Celtics,</p>
+                  </li>
+                  <li>
+                    <p>Arsenal F.C.,</p>
+                  </li>
+                  <li>
+                    <p>Philadelphia 76ers,</p>
+                  </li>
+                  <li>
+                    <p>Premier League,</p>
+                  </li>
+                  <li>
+                    <p>UFC,</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="text-base font-light text-gray-700 space-y-2 justify-self-end self-end px-2 pb-4"
+        >
+         <p class="text-[10px] capitalize">JOIN For Beam Groups</p>
+          <div class="space-y-2">
+            <p>
+              Create an account to follow your favorite communities and start
+              taking part in conversations.
+            </p>
+            {% if user.is_authenticated %}
+            
+            <button id="create-group"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+            > <a href={% url 'groups:create-group' request.user.id %}>
+              Create Group</a>
+            </button>
+            {% else %}
+            <a href="{% url 'accounts:sign_up' %}">
+                <button 
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+                > 
+                  Join Beam
+                </button></a>
+            {% endif %}
+          </div>
+        </div>
+      </aside>
+      <article
+        class="w-full bg-transparent min-h-[calc(100vh-52px)] flex px-8 py-4 space-x-8"
+      >
+
+      <div class="w-1/2 space-y-8">
+        <section class="bg-white rounded text-gray-700">
+          <!-- Header Banner -->
+          <p class="text-[15px] font-bold capitalize items-center ">TOP COMMUNITIES</p>
+          <div class="p-2 rounded">
+            <ul class="space-y-4">
+              {% for group in all_groups %}
+              <li class="flex justify-between">
+                <p>{{forloop.counter}}</p>
+                <p>b/{{ group.name_of_group }}</p>
+
+                {% if request.user.id == group.owner.id %}
+                <button
+                class="bg-blue-500 hover:bg-blue-700 align-left
+                item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                >
+                <a href="{%  url 'groups:group' group.id 'admin' %}">
+                Enter
+                </button></a>
+                {% elif group.is_closed %}
+                  <button
+                  class="bg-blue-500 hover:bg-blue-700 align-left
+                  item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                   onclick="a request has been sent to the admin">
+                  <a href="{%  url 'groups:group' group.id 'request' %}">
+                  Request
+                  </button>
+              {% else %}
+                  <button
+                  class="bg-blue-500 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                  >
+                  <a href="{%  url 'groups:group' group.id 'join' %}">
+                  Join</a>
+                  </button>
+            
+              {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section> 
+        <section
+          class="sticky top-[60px] text-[14px] font-light bg-white p-4 rounded"
+        >
+          <div class="grid grid-cols-2 gap-2">
+            <p>User Agreement</p>
+            <p>Content Policy</p>
+            <p>Privacy Policy</p>
+            <p>Moderator Guidelines</p>
+          </div>
+          <div class="w-full h-[1px] bg-gray-300 my-4"></div>
+          <div class="grid grid-cols-2 gap-2">
+            <p>English</p>
+            <p>Italiano</p>
+            <p>Deutsch</p>
+            <p>Português</p>
+            <p>Español</p>
+            <p>Français</p>
+          </div>
+          <div class="w-full h-[1px] bg-gray-300 my-4"></div>
+
+          <p>For Beam Groups Inc © 2022. All rights reserved</p>
+        </section>
+      </div>
+      {% include 'messages.html'%}
+     
+   {% block  content %}
+
+   {% endblock %}
+      </article>
+
+    </div>
+</div>
+    <script>
+     {% static 'app.js' %}
+
+    </script>
+  </body>
+</html>

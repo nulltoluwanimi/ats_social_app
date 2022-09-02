@@ -1,0 +1,85 @@
+{% extends 'base_generic.html' %}
+
+{% block content%}
+
+<div>  
+
+    <div class="mx-12 ">
+
+        <form class="" method="POST" enctype="multipart/form-data" action="">
+
+            {% csrf_token %}
+
+            {{ form.media }}
+
+            {{ form.as_p }}
+
+            <button class="bg-blue-500 py-4 px-4 m-2 text-white " type="submit">Create Post</button>
+
+        </form>
+
+
+
+            <h3>{{group.title}}</h3>
+
+            <small>{{group.owner}} created on {{group.date_created}}</small>
+
+
+
+            {% comment %} <img src="{{group.picture.url}}" alt="{{group.name}}"> {% endcomment %}
+
+
+
+
+            {% if group.is_closed %}
+
+            <p><strong>CLOSED</strong></p>
+
+            {% endif %}
+
+
+
+
+            <p>{{group.description}}</p>
+
+
+
+
+
+            {% for post in posts %}
+
+                  <h2> {{ post.title }}</h3>
+
+                    {{group.title|safe}} <!-- remove linebreaks -->
+
+                    <p>by {{post.member}} {{post.date_created | timesince }}</p>
+
+                   
+
+
+
+                    {% comment %} <img src="{{post.image.url}}" alt="{{post.title}}"> {% endcomment %}
+
+                  <p>{{ post.body|safe }}</p>
+
+                  <form action="" method="POST" enctype="multipart/form-data">
+{% comment %} 
+                    {% csrf_token %}
+
+                    {{form.as_p}}
+
+
+
+                  </form> {% endcomment %}
+
+            {% empty %}
+
+            <p>No Posts Available At the Moment</p>
+
+            {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

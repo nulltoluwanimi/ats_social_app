@@ -1,6 +1,7 @@
 from django.db import models
 
 from django.contrib.auth import get_user_model
+from django_ckeditor_5.fields import CKEditor5Field
 User = get_user_model()
 
 
@@ -61,7 +62,8 @@ class GroupRequest(models.Manager):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE)
     request_message = models.TextField()
-    status = models.CharField(choices=STATUS_CHOICES, max_length=15, null=True, default="INITIATED")
+    status = models.CharField(choices=STATUS_CHOICES,
+                              max_length=15, null=True, default="INITIATED")
     time_stamp = models.DateTimeField(auto_now_add=True)
 
 
@@ -78,6 +80,9 @@ class Members(models.Model):
     suspended_objects = SuspendedMember()
     not_suspended_objects = NotSuspendedMember()
 
+    def __str__(self):
+        return self.member.full_name
+
     class Meta:
         verbose_name = 'member'
         verbose_name_plural = 'members'
@@ -87,7 +92,7 @@ class Posts(models.Model):
     member = models.ForeignKey(Members, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=50, null=True)
-    body = models.TextField()
+    body = CKEditor5Field('body', config_name="extends")
     image = models.ImageField(blank=True, upload_to="post_images", null=True)
     additional_files = models.FileField(
         blank=True, upload_to="post_files", null=True)
