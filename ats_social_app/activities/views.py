@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect 
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
 from .forms import EventCreateForm, PollForms
 from .models import Event, Notification, Poll
@@ -15,7 +16,7 @@ from groups.models import Group, Members
 #pk - user.id
 #id = group.id
 #_id = **kwargs
-
+@login_required(login_url="accounts:sign_in")
 def create_event(request, pk, id):
     form = EventCreateForm()
     
@@ -47,6 +48,7 @@ def create_event(request, pk, id):
     return
 
 
+@login_required(login_url="accounts:sign_in")
 def edit_event(request, pk, id, _id):
     event = Event.running_objects.get(id=_id)
     form = EventCreateForm(instance=event)
@@ -64,16 +66,17 @@ def edit_event(request, pk, id, _id):
     }
     return
 
+
 class EventList(LoginRequiredMixin, ListView):
     model = Event
     template_name = ""
     context_object_name = "event_list"
-    login_url = ""
+    login_url = "accounts:sign_in"
     
     def get_queryset(self, **kwargs):
         return Event.running_objects.filter(group_id=kwargs["id"])
 
-
+@login_required(login_url="accounts:sign_in")
 def accept_invite(request, pk, id, _id):
     event = Event.running_objects.get(id=_id)
     event.yes.append(User.objects.get(id=pk))
@@ -81,6 +84,7 @@ def accept_invite(request, pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
+@login_required(login_url="accounts:sign_in")
 def reject_invite(request, pk, id, _id):
     event = Event.running_objects.get(id=_id)
     event.no.append(User.objects.get(id=pk))
@@ -88,6 +92,7 @@ def reject_invite(request, pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
+@login_required(login_url="accounts:sign_in")
 def inconclusive_decision_invite(request, pk, id, _id):
     event = Event.running_objects.get(id=_id)
     event.maybe.append(User.objects.get(id=pk))
@@ -95,10 +100,11 @@ def inconclusive_decision_invite(request, pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-class AdminEventDetail(UserPassesTestMixin,  DetailView):
+class AdminEventDetail(LoginRequiredMixin,UserPassesTestMixin,  DetailView):
     model = Event
     template_name = ""
     context = 'events'
+    login_url = "accounts:sign_in"
     
     def test_func(self, **kwargs) :
         admin_status = Members.active_objects.get(user_id=kwargs["pk"], group_id=kwargs["id"])
@@ -109,10 +115,11 @@ class AdminEventDetail(UserPassesTestMixin,  DetailView):
 
 
 
-class AdminAllGroupEvents(UserPassesTestMixin,  ListView):
+class AdminAllGroupEvents(LoginRequiredMixin,UserPassesTestMixin,  ListView):
     model = Event
     template_name = ""
     context = "events"
+    login_url = "accounts:sign_in"
     
     def test_func(self, **kwargs) :
         admin_status = Members.active_objects.get(user_id=kwargs["pk"], group_id=kwargs["id"])
@@ -122,6 +129,7 @@ class AdminAllGroupEvents(UserPassesTestMixin,  ListView):
         return Event.objects.filter(group_id=kwargs["id"])
 
 
+@login_required(login_url="accounts:sign_in")
 def create_polls(request, pk, id):
     form = PollForms()
     
@@ -153,6 +161,7 @@ def create_polls(request, pk, id):
     return
 
 
+@login_required(login_url="accounts:sign_in")
 def polls_option1(request,pk, id, _id):
     poll = Poll.objects.get(id=_id)
     poll.polls_option["polls_1"] += 1
@@ -160,18 +169,23 @@ def polls_option1(request,pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
+@login_required(login_url="accounts:sign_in")
 def polls_option2(request,pk, id, _id):
     poll = Poll.objects.get(id=_id)
     poll.polls_option["polls_2"] += 1
     poll.save()
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
+
+@login_required(login_url="accounts:sign_in")
 def polls_option3(request,pk, id, _id):
     poll = Poll.objects.get(id=_id)
     poll.polls_option["polls_3"] += 1
     poll.save()
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
+
+@login_required(login_url="accounts:sign_in")
 def polls_option4(request, id, _id):
     poll = Poll.objects.get(id=_id)
     poll.polls_option["polls_4"] += 1
