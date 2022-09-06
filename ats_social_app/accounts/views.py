@@ -13,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CustomUserForm, UserEditForm
 from groups.models import Members, Posts, Comments, Replies
+from activities.models import Notification
 
 User = get_user_model()
 
@@ -110,6 +111,7 @@ class UserProfile(DetailView):
         context["groups"] = number_of_groups
         context["posts"] = post_created
         context["replies"] = replies_created
+        context["notification"] = Notification.objects.all(user_id=kwargs["pk"])
         return context
 
 
