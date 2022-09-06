@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CustomUserForm, UserEditForm
-from groups.models import Members, Posts, Comments, Replies
+from groups.models import Members, Posts, Comments, Replies, Groups, GroupRequest
 from activities.models import Notification
 
 User = get_user_model()
@@ -90,7 +90,8 @@ class UserProfile(DetailView):
         post_created = []
         comment_created = []
         replies_created = []
-        number_of_groups = Members.active_objects.all(user_id=kwargs["pk"])
+        group_requests = []
+        number_of_groups = Members.active_objects.filter(user_id=kwargs["pk"])
         for member in number_of_groups:
             for post in Posts.objects.all():
                 if member.id == post.member_id:
@@ -105,6 +106,13 @@ class UserProfile(DetailView):
             for reply in Replies.active_objects.all():
                 if member.id == reply.member_id:
                     replies_created.append(reply)
+
+        admin_for_request = Groups.active_objects.filter(owner_id=kwargs["pk"])
+
+        for group in admin_for_request:
+            for request in GroupRequest.objects.all():
+                if group.id == request.group_id:
+                    group_requests.append(request)
 
         context = super(UserProfile, self).get_context_data()
         context["user"] = self.get_queryset()
