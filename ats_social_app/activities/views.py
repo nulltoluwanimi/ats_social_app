@@ -41,6 +41,9 @@ def create_event(request, pk, id):
             
             messages.success(request, "Event Created Successfuly")
             return
+        error = (form.errors.as_text()).split("*")
+        messages.error(request, error[len(error) - 1])
+
     
     context = {
         "form": form
@@ -59,6 +62,8 @@ def edit_event(request, pk, id):
             form.save()
             
             return
+        error = (form.errors.as_text()).split("*")
+        messages.error(request, error[len(error) - 1])
     
     context = {
         "form": form,

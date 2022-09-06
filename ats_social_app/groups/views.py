@@ -35,6 +35,9 @@ def group_details(request, pk, type):
                 new_post = post_form.save(commit=False)
                 new_post.group = Groups.objects.get(pk=pk)
                 new_post.save()
+            else:
+                error = (post_form.errors.as_text()).split("*")
+                messages.error(request, error[len(error) - 1])
 
             return HttpResponseRedirect(reverse("groups:group", args=[pk, type]))
         except Groups.DoesNotExist:

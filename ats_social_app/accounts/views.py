@@ -12,7 +12,10 @@ from django.utils.encoding import force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CustomUserForm, UserEditForm
+from groups.models import Members, Posts, Comments, Replies
+
 User = get_user_model()
+
 
 # Create your views here.
 
@@ -39,7 +42,7 @@ def sign_up(request):
 
         else:
             error = (form.errors.as_text()).split('*')
-            messages.error(request, error[len(error)-1])
+            messages.error(request, error[len(error) - 1])
             return render(request, "accounts/sign_up.html", )
 
     context = {"form": form,
@@ -49,7 +52,6 @@ def sign_up(request):
 
 
 def user_sign_in(request):
-
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -78,8 +80,37 @@ def user_sign_out(request):
 
 class UserProfile(DetailView):
     model = User
-    context_object_name = 'user'
     template_name = 'accounts/profile_view.html'
+
+    def get_queryset(self, **kwargs):
+        return User.objects.get(id=kwargs["pk"])
+
+    def get_context_data(self, **kwargs):
+        post_created = []
+        comment_created = []
+        replies_created = []
+        number_of_groups = Members.active_objects.all(user_id=kwargs["pk"])
+        for member in number_of_groups:
+            for post in Posts.objects.all():
+                if member.id == post.member_id:
+                    post_created.append(member)
+
+        for member in number_of_groups:
+            for comment in Comments.active_objects.all():
+                if member.id == comment.member_id:
+                    comment_created.append(comment)
+
+        for member in number_of_groups:
+            for reply in Replies.active_objects.all():
+                if member.id == reply.member_id:
+                    replies_created.append(reply)
+
+        context = super(UserProfile, self).get_context_data()
+        context["user"] = self.get_queryset()
+        context["groups"] = number_of_groups
+        context["posts"] = post_created
+        context["replies"] = replies_created
+        return context
 
 
 def user_edit_details(request, pk):
@@ -93,7 +124,10 @@ def user_edit_details(request, pk):
             form.save()
             messages.success(request, "Edit successfully")
             return HttpResponseRedirect(reverse('accounts:profile', args=({'pk': pk})))
+        error = (form.errors.as_text()).split("*")
+        messages.error(request, error[len(error) - 1])
         messages.error(request, f"Invalid entry")
+
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     elif request.method == "GET":
