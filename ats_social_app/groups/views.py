@@ -48,10 +48,6 @@ def create_group(request, pk):
         form = GroupCreateForm(request.POST, request.FILES)
 
         if form.is_valid():
-            creator = form.save(commit=False)
-            creator.owner = User.objects.get(id=pk)
-
-            creator.save()
             new_group = Groups(owner=request.user, name_of_group=form.cleaned_data['name_of_group'],
                                title=form.cleaned_data['title'], description=form.cleaned_data['description'])
             new_group.save()
@@ -59,7 +55,7 @@ def create_group(request, pk):
             group_admin = Members.objects.create(
                 group=Groups.objects.get(pk=new_group.id),  # STILL CHECK LATER
                 member=request.user,
-                is_admin=True,
+
             )
 
             group_admin.save()
