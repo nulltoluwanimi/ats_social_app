@@ -1,48 +1,38 @@
 {% extends 'base_generic.html' %}
 {% load static %}
-     {%  block content %}
-        <div class="w-full my-8">
-            <div class="w-full">
-                {% include 'events.html' %}
-              </div>
-          <!-- Card -->
-          <div class="space-y-4 mt-12">
-            {% for  post in open_posts %}
-            <div class="bg-white p-2">
-              <div class="flex justify-between space-x-2">
-                <div class="flex text-gray-500 text-base items-center">
-                  <small> b/{{ post.group.name }} </small>
-                  &nbsp;
-                   <small class="font-light">
-                    •&nbsp;Posted by u/user {{post.date_created|timesince}} ago
-                  </small> 
-                </div>
-                {% comment %} <button
-                  class="bg-blue-500 hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
-                >
-                  Join
-                </button> {% endcomment %}
-              </div>
-              <h3>{{post.body|safe}}</h3>
-              {% comment %} <img
-                src="https://image.shutterstock.com/shutterstock/photos/2028609842/display_1500/stock-photo-portrait-of-a-man-smiling-2028609842.jpg"
-                alt=""
-              /> {% endcomment %}
-              <div class="flex items-center justify-end gap-4 ">
-                <span class="flex gap-2 text-sm" >
-                    <img class="h-6 w-auto" src="{% static 'icons/share.png' %}" alt="icons" /> 
-                </span>
-                <span class="flex gap-2 text-sm" >
-                    <img class="h-6 w-auto" src="{% static 'icons/padlock.png' %}" alt="icons" /> 
-                </span>
-                <span class="flex gap-2 text-sm" >
-                    <img class="h-6 w-auto" src="{% static 'icons/bubble-chat.png' %}" alt="icons" /> 
-                   {% comment %} 4k comments {% endcomment %}
-                </span>
-            </div>
-            </div>
-         
-          </div>
-          {% endfor %}
+{% block content %}
+<div class="w-full my-8">
+  <div class="w-full">
+    {% include 'events.html' %}
+  </div>
+  <!-- Card -->
+  <div class="space-y-4 mt-12">
+    {% for post in open_posts %}
+    <div class="bg-white p-2">
+      <div class="flex justify-between space-x-2">
+        <div class="flex text-gray-500 text-base items-center">
+          <small> b/{{ post.group.name }} </small>
+          &nbsp;
+          <small class="font-light">
+            •&nbsp;Posted by u/user {{post.date_created|timesince}} ago
+          </small>
         </div>
-{% endblock %}
+
+      </div>
+      <h3>{{post.body|safe}}</h3>
+      <div class="flex items-center justify-end gap-4 ">
+        <span class="flex gap-2 text-sm">
+          <img class="h-6 w-auto" src="{% static 'icons/share.png' %}" alt="icons" />
+        </span>
+        <span class="flex gap-2 text-sm">
+          <img class="h-6 w-auto" src="{% static 'icons/padlock.png' %}" alt="icons" />
+        </span>
+        <span class="flex gap-2 text-sm">
+          <img class="h-6 w-auto" src="{% static 'icons/bubble-chat.png' %}" alt="icons" />
+          {% comment %} 4k comments {% endcomment %}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endblock %}

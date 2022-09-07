@@ -44,7 +44,17 @@
   .aside__dropdown ul {
     display: none;
   }
-  
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+
+        scrollbar-width: none;
+    }
+
     </style>
 
 
@@ -89,7 +99,7 @@
           <button
             class="bg-blue-500 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0"
           >
-           Sing In 
+           Sign In 
           </button></a>
           {% else %}
           <div class="relative">
@@ -101,15 +111,17 @@
 
              {% else %}
              <div class="flex gap-4 ">
-             <a href="{% url 'accounts:sign_out'%}">
+             {% comment %} <a href="{% url 'accounts:sign_out'%}">
                 <button
                   class="bg-blue-500 mt-2 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0"
                 >
                  Logout
-                </button></a>
+                </button>
+              </a> {% endcomment %}
+                <div>
                 <img class="w-10 h-10 rounded-full" src="{{ user.profile_picture.url }}" alt="">
             <span class="top-0 left-7 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
-
+                </div>
              </div>
                 {% endif %}
             </a>
@@ -122,7 +134,7 @@
       <aside
         class="w-1/4 max-w-1/4 bg-white h-[calc(100vh-52px)] flex flex-col text-gray-700 sticky top-[52px] space-y-4"
       >
-        <div class="space-y-4 pb-4 h-full flex-1 overflow-y-scroll px-2 mt-6">
+        <div class="space-y-4 pb-4 h-full flex-1 overflow-y-scroll no-scrollbar px-2 mt-6">
           <div class="space-y-2">
             <p class="text-[10px] capitalize">FEEDS</p>
             <div class="text-[14px] font-sans text-gray-800 space-y-2">
@@ -136,7 +148,7 @@
           </div>
           <div class="space-y-2">
             <p class="text-[15px] font-bold capitalize">RECENT COMMUNITIES</p>
-            <div class="text-[14px] font-light text-black space-y-2">
+            {% comment %} <div class="text-[14px] font-light text-black space-y-2">
              {% for group in recently_created_groups %}
              <div>
                 <p>{{forloop.counter}}- b/{{group.name_of_group}}</p>
@@ -145,10 +157,57 @@
               <div class="mt-6 underline ">
                 <p>Create Community</p>
               </div>
-            </div>
+            </div> {% endcomment %}
+            <section class="bg-white rounded text-gray-700">
+              <!-- Header Banner -->
+              {% comment %} <p class="text-[15px] font-bold capitalize items-center ">TOP COMMUNITIES</p> {% endcomment %}
+              <div class="p-2 rounded">
+                <ul class="space-y-4">
+                  {% for group in all_groups %}
+                  <li class="flex justify-between">
+                    {% comment %} <p>{{forloop.counter}}</p> {% endcomment %}
+                    <div class="flex flex-col">
+                    <p class="text-right flex items-right font-bold text-sm">b/{{ group.name_of_group }}</p>
+                    {% if not user.username == group.owner.username %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by {{ group.owner.username }}</p>
+                    {% else %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by you</p>
+                    {% endif %}
+                    </div>
+    
+                    {% if request.user.id == group.owner.id %}
+                    <button
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:group' group.id 'admin' %}">
+                    Enter
+                    </button></a>
+                    {% elif group.is_closed %}
+                    <button
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:group' group.id 'request' %}">
+                    Request
+                    </button></a>
+                  {% else %}
+                      <button
+                      class="bg-blue-500 w-20 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                      >
+                      <a href="{%  url 'groups:group' group.id 'join' %}">
+                      Join</a>
+                      </button>
+                
+                  {% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </section> 
           </div>
 
-          <div class="space-y-2">
+          {% comment %} <div class="space-y-2">
             <p class="text-[10px] capitalize">Explore</p>
             <div class="text-[18px] text-gray-800 space-y-4 cursor-pointer">
               <div class="aside__dropdown" data-index="1">
@@ -238,7 +297,7 @@
                 </ul>
               </div>
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
 
         <div
@@ -252,98 +311,67 @@
             </p>
             {% if user.is_authenticated %}
             
-            <button id="create-group"
-              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-            > <a href={% url 'groups:create-group' request.user.id %}>
-              Create Group</a>
+            <button id="create-group" type="button" data-modal-toggle="large-modal"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+            {% comment %} > <a href={% url 'groups:create-group' request.user.id %}> {% endcomment %}
+              Create Group
+            {% comment %} </a> {% endcomment %}
             </button>
             {% else %}
-            <a href="{% url 'accounts:sign_up' %}">
+            {% comment %} <a href="{% url 'accounts:sign_up' %}"> {% endcomment %}
                 <button 
                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
                 > 
                   Join Beam
-                </button></a>
+                </button>
+              {% comment %} </a> {% endcomment %}
             {% endif %}
           </div>
         </div>
       </aside>
       <article
-        class="w-full bg-transparent min-h-[calc(100vh-52px)] flex px-8 py-4 space-x-8"
+        class="w-full bg-transparent flex px-8 py-4 space-x-8"
       >
-
-      <div class="w-1/2 space-y-8">
-        <section class="bg-white rounded text-gray-700">
-          <!-- Header Banner -->
-          <p class="text-[15px] font-bold capitalize items-center ">TOP COMMUNITIES</p>
-          <div class="p-2 rounded">
-            <ul class="space-y-4">
-              {% for group in all_groups %}
-              <li class="flex justify-between">
-                <p>{{forloop.counter}}</p>
-                <p>b/{{ group.name_of_group }}</p>
-
-                {% if request.user.id == group.owner.id %}
-                <button
-                class="bg-blue-500 hover:bg-blue-700 align-left
-                item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
-                >
-                <a href="{%  url 'groups:group' group.id 'admin' %}">
-                Enter
-                </button></a>
-                {% elif group.is_closed %}
-                  <button
-                  class="bg-blue-500 hover:bg-blue-700 align-left
-                  item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
-                   onclick="a request has been sent to the admin">
-                  <a href="{%  url 'groups:group' group.id 'request' %}">
-                  Request
-                  </button>
-              {% else %}
-                  <button
-                  class="bg-blue-500 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
-                  >
-                  <a href="{%  url 'groups:group' group.id 'join' %}">
-                  Join</a>
-                  </button>
-            
-              {% endif %}
-              </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </section> 
-        <section
-          class="sticky top-[60px] text-[14px] font-light bg-white p-4 rounded"
-        >
-          <div class="grid grid-cols-2 gap-2">
-            <p>User Agreement</p>
-            <p>Content Policy</p>
-            <p>Privacy Policy</p>
-            <p>Moderator Guidelines</p>
-          </div>
-          <div class="w-full h-[1px] bg-gray-300 my-4"></div>
-          <div class="grid grid-cols-2 gap-2">
-            <p>English</p>
-            <p>Italiano</p>
-            <p>Deutsch</p>
-            <p>Português</p>
-            <p>Español</p>
-            <p>Français</p>
-          </div>
-          <div class="w-full h-[1px] bg-gray-300 my-4"></div>
-
-          <p>For Beam Groups Inc © 2022. All rights reserved</p>
-        </section>
-      </div>
+     <div class="flex flex-col">
       {% include 'messages.html'%}
-     
-   {% block  content %}
-
-   {% endblock %}
+      {% block  content %}
+      
+      {% endblock %}
+    </div> 
       </article>
 
     </div>
+</div>
+<div id="large-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
+  <div class="relative p-4 w-full max-w-4xl h-full md:h-auto">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <!-- Modal header -->
+          <div class="flex justify-between items-center p-5 rounded-t border-b dark:border-gray-600">
+              <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                  Large modal
+              </h3>
+              <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="large-modal">
+                  <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                  <span class="sr-only">Close modal</span>
+              </button>
+          </div>
+          <!-- Modal body -->
+          <div class="p-6 space-y-6">
+              <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                  With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
+              </p>
+              <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                  The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
+              </p>
+          </div>
+          <!-- Modal footer -->
+          <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
+              <button data-modal-toggle="large-modal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I accept</button>
+              <button data-modal-toggle="large-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Decline</button>
+          </div>
+      </div>
+  </div>
 </div>
     <script>
      {% static 'app.js' %}

@@ -3,24 +3,32 @@
      {%  block content %}
        <form method='POST' action="" enctype="multipart/form-data">
         {% csrf_token %}
-
-        <label>full name: </label> 
+       
+        <label for="nationality" class="block text-sm font-medium text-gray-700">Full name</label>
      {{form.full_name}}
      <br>
      <br>  
 
-     <label>Profile Picture: </labe> 
+     <label for="nationality" class="block text-sm font-medium text-gray-700">Profile picture</label>
      {{form.profile_picture}}
      <br>
      <br>
 
-     <label>Phone Number: </labe> 
+     <label for="nationality" class="block text-sm font-medium text-gray-700">Phone Number</label>
      {{form.phone_number}}
      <br>
      <br>
 
-     <label>Nationality: </labe> 
-     {{form.nationality}}
+     <div class="sm:col-span-3">
+        <label for="nationality" class="block text-sm font-medium text-gray-700">Nationality</label>
+        <div class="mt-1">
+          <select id="nationality" name="nationality" autocomplete="country-name" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full h-full sm:text-sm border-gray-300 rounded-md border rounded-[10px] w-[483px] h-[43px] pl-[20px] mt-[5px] bg-[#FBFBFB] outline-none">
+            {% for country in countries %}
+              <option>{{ country }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
      <br>
      <br>
      <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium

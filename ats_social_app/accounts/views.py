@@ -1,3 +1,5 @@
+import pycountry
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
@@ -13,6 +15,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CustomUserForm, UserEditForm
 User = get_user_model()
+countries = list(pycountry.countries)
 
 # Create your views here.
 
@@ -77,6 +80,7 @@ def user_sign_out(request):
 
 
 class UserProfile(DetailView):
+    
     model = User
     context_object_name = 'user'
     template_name = 'accounts/profile_view.html'
@@ -92,13 +96,15 @@ def user_edit_details(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Edit successfully")
-            return HttpResponseRedirect(reverse('accounts:profile', args=({'pk': pk})))
-        messages.error(request, f"Invalid entry")
+            return HttpResponseRedirect(reverse('accounts:profile', args=(pk,)))
+        error = (form.errors.as_text()).split('*')
+        messages.error(request, error[len(error)-1])
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     elif request.method == "GET":
         context = {
-            "form": form
+            "form": form,
+            'countries':  [country.name for country in countries]
         }
         return render(request, 'accounts/edit_profile.html', context)
 
