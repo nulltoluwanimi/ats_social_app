@@ -32,7 +32,7 @@ class Notification(models.Model):
     group = models.ForeignKey(Groups, on_delete=models.SET_NULL, null=True)
     content = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
-    is_admin_notification = models.BooleanField(default=True)
+    is_admin_notification = models.BooleanField(default=False)
 
 
 class Events(models.Model):

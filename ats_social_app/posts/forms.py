@@ -20,7 +20,7 @@ class NewCommentForm(forms.ModelForm):
 
 
 class ReplyForm(forms.ModelForm):
-    class Mata:
+    class Meta:
         model = Reply
         fields = ['reply']
         widget = {
