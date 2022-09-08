@@ -163,7 +163,7 @@
                     {% endif %}
                     </div>
     
-                    {% if request.user.id == group.owner.id %}
+                    {% if  user.is_authenticated and request.user.id == group.owner.id %}
                     <button
                     class="bg-blue-500 w-20 hover:bg-blue-700 align-left
                     item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
@@ -172,7 +172,7 @@
                     Enter
                     </button></a>
 
-                    {% elif group.is_closed %}
+                    {% elif user.is_authenticated and group.is_closed %}
                     <button  id="group-action"
                     class="bg-blue-500 w-20 hover:bg-blue-700 align-left
                     item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
@@ -222,7 +222,7 @@
                       </div>
                     </div>
                   </div>
-                  {% else %}
+                  {% elif user.is_authenticated  %}
                       <button
                       class="bg-blue-500 w-20 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
                       >

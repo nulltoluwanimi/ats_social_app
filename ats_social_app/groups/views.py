@@ -29,18 +29,7 @@ from activities.models import Notification, Event, Poll
 #     # }
 #     return render(request, "home.html")
 
-<<<<<<< HEAD
-def group_test(request):
-    context = {
-        'post_form': PostForm(),
-        # 'poll_form': PollForms(),
-        # 'event_form': EventCreateForm()
 
-
-        
-    }
-    return render(request, "groups/group_edit.html",context )
-=======
 # def group_test(request):
 #     context = {
 #         'post_form': PostForm(),
@@ -50,7 +39,7 @@ def group_test(request):
 #     }
 #     return render(request, "groups/group_edit.html", context)
 
->>>>>>> a18cb40f0a45e79832a27539173f8e7d8d0f0d4d
+
 
 # def group_test(request):
 #     return render(request, "groups/group_timeline.html", )
