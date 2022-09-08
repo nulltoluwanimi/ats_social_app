@@ -166,9 +166,6 @@ def make_admin(request, pk, id, _id):
 
         )
 
-        for members in group.members_set.filter(is_active=True, is_suspended=False):
-            notification.user.add(members.member)
-
         notification.save()
 
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -198,10 +195,6 @@ def remove_as_admin(request, pk, id, _id):
             group=group,
 
         )
-
-        for members in group.members_set.filter(is_active=True, is_suspended=False):
-            notification.user.add(members.member)
-
         notification.save()
 
         messages.success(request, f"{member.member.username} removed as admin successfully")
@@ -230,9 +223,6 @@ def remove_member_of_group(request, pk, id, _id):
         group=group,
 
     )
-
-    for members in group.members_set.filter(is_active=True, is_suspended=False):
-        notification.user.add(members.member)
 
     notification.save()
 
@@ -322,11 +312,8 @@ def join_group(request, pk, id):
         notification = Notification.objects.create(
             group=group,
             content=f"{new_member.username} wants to join the group",
-            is_admin_notification=True,
-        )
 
-        for folks in group.members_set.all():
-            notification.user.add(folks.member)
+        )
 
         notification.save()
 
@@ -338,7 +325,7 @@ def join_group(request, pk, id):
         for member in group.members_set.all():
             if member.member_id == pk:
                 messages.info(request, f"You are already a member of {group.name_of_group}")
-                return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+                return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
 
         member = Members.objects.create(
             member=new_member,
@@ -351,10 +338,8 @@ def join_group(request, pk, id):
             content=f"{new_member.username} has joined the group",
 
         )
-        for folks in group.members_set.all():
-            notification.user.add(folks.member)
         notification.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+        return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
 
 
 @login_required(login_url="accounts:sign_in")
@@ -408,11 +393,9 @@ def exit_group(request, pk, id):
     notification = Notification.objects.create(
         group=group,
         content=f"{member.user.username} left the {group}",
-        is_admin_notification=True
     )
 
-    for members in group.members_set.filter(is_active=True, is_suspended=False):
-        notification.user.add(members.member)
+
     notification.save()
     return HttpResponseRedirect(reverse("groups:home"))
 
