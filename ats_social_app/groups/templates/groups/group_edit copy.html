@@ -1,0 +1,133 @@
+{% extends 'base_generic.html' %}
+
+{% block content%}
+
+<div class="mx-auto p-4  flex flex-col   ">
+
+  <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'Post')">Post</button>
+    <button class="tablinks" onclick="openCity(event, 'Paris')">Poll</button>
+    <button class="tablinks" onclick="openCity(event, 'Tokyo')">Event</button>
+  </div>
+
+  <div id="Post" class="tabcontent">
+    <h3></h3>
+    <form class="" method="POST" enctype="multipart/form-data" action="">
+
+      {% csrf_token %}
+      <div class="w-full">
+        {{ post_form.media }}
+
+        {{ post_form.as_p }}
+        <button class="bg-blue-500 py-4 px-4 m-2 text-white  " type="submit">Create Post</button>
+      </div>
+
+
+    </form>
+
+  </div>
+
+  <div id="Paris" class="tabcontent">
+    <h3>Paris</h3>
+    <p>Paris is the capital of France.</p>
+  </div>
+
+  <div id="Tokyo" class="tabcontent">
+    <h3>Tokyo</h3>
+    <p>Tokyo is the capital of Japan.</p>
+  </div>
+</div <div class="mx-12 ">
+
+{% comment %} <form class="" method="POST" enctype="multipart/form-data" action="">
+
+  {% csrf_token %}
+
+  {{ form.media }}
+
+  {{ form.as_p }}
+
+  <button class="bg-blue-500 py-4 px-4 m-2 text-white " type="submit">Create Post</button>
+
+</form>
+
+
+
+<h3>{{group.title}}</h3>
+
+<small>{{group.owner}} created on {{group.date_created}}</small>
+
+
+
+{% comment %} <img src="{{group.picture.url}}" alt="{{group.name}}"> {% endcomment %}
+
+
+{% comment %}
+
+{% if group.is_closed %}
+
+<p><strong>CLOSED</strong></p>
+
+{% endif %}
+
+
+
+
+<p>{{group.description}}</p>
+
+
+
+
+
+{% for post in posts %}
+
+<h2> {{ post.title }}</h3>
+
+  {{group.title|safe}}
+  <!-- remove linebreaks -->
+
+  <p>by {{post.member}} {{post.date_created | timesince }}</p>
+
+
+
+
+
+  {% comment %} <img src="{{post.image.url}}" alt="{{post.title}}"> {% endcomment %}
+
+  {% comment %} <p>{{ post.body|safe }}</p> {% endcomment %}
+
+  {% comment %} <form action="" method="POST" enctype="multipart/form-data"> {% endcomment %}
+    {% comment %}
+    {% csrf_token %}
+
+    {{form.as_p}}
+
+
+
+  </form> {% endcomment %}
+
+  {% comment %} {% empty %} {% endcomment %}
+
+  {% comment %} <p>No Posts Available At the Moment</p> {% endcomment %}
+
+  {% comment %} {% endfor %} {% endcomment %}
+
+  {% comment %} </div> {% endcomment %}
+
+  </div>
+
+  <script>
+    function openCity(evt, cityName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  </script>
+  {% endblock %}

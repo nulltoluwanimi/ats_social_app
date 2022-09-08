@@ -1,12 +1,14 @@
 const dropdowns = document.querySelectorAll('.aside__dropdown');
 const logout = document.getElementById('popup-modal');
-const group = document.getElementById('create-group');
+const group = document.getElementById('group-action');
 const group_modal = document.getElementById('group_section');
+const large_modal = document.getElementById('large-modal')
+
+const action_modal = document.querySelector('#group-action');
 
 let currentDropdown = null;
 const uls = document.querySelectorAll('.aside__dropdown ul');
 const btns = document.querySelectorAll('.aside__dropdown .arrow-down');
-console.log(group_modl)
 
 dropdowns.forEach((dropdown, i) => {
   dropdown.addEventListener('click', (e) => {
@@ -31,12 +33,11 @@ dropdowns.forEach((dropdown, i) => {
 
 
 group?.addEventListener('click', () => {
-  logout.style.display = 'flex';
-  group_modal.style.display = 'flex';
+  large_modal.style.display = 'flex';
 });
 
 function closeDialog() {
-  logout.style.display = "none"
+  large_modal.style.display = "none"
 
 }
 
@@ -45,3 +46,5 @@ group?.addEventListener('click', (e) => {
     logout.style.display = 'none';
   }
 });
+
+

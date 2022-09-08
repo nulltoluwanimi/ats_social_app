@@ -4,7 +4,7 @@ from . import views
 
 app_name = "groups"
 urlpatterns = [
-    path("", views.home, name='home'),
+    path("groups_test/", views.group_test, name="group_test"),
     path("<int:pk>/create-group/", views.create_group, name="create-group"),
     path('<int:pk>/group/<int:id>/', views.group_details, name="group"),
     path('<int:pk>/group/<int:id>/make_admin/<int:_id>', views.make_admin, name="make_admin"),
@@ -25,6 +25,8 @@ urlpatterns = [
     path("<int:pk>/group/<int:id>/comment/<int:_id>/hide/", views.hide_comment, name="hide_comment"),
     path("<int:pk>/group/<int:id>/reply/<int:_id>/hide/", views.hide_reply, name="hide_reply"),
     path("<int:pk>/group/<int:id>/post/<int:_id>/hide/", views.hide_post, name="hide_post"),
+    path("<int:pk>/group_request/<int:id>/", views.accept_request_closed_group, name="join_closed_group"),
+    path("<int:pk>/group_request/<int:id>/", views.reject_request_closed_group, name="reject_closed_group")
     
-   
+
 ]

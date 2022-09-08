@@ -1,7 +1,7 @@
 from multiprocessing import Event
 from django.contrib import admin
-from .models import Notification, Events, Polls
+from .models import Notification, Event, Poll
 # Register your models here.
 admin.site.register(Notification)
-admin.site.register(Events)
-admin.site.register(Polls)
+admin.site.register(Event)
+admin.site.register(Poll)

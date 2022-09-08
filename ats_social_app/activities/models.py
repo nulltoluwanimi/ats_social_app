@@ -32,7 +32,7 @@ class Notification(models.Model):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     content = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
-    is_admin_notification = models.BooleanField(default=True)
+    is_admin_notification = models.BooleanField(default=False)
 
 
 class Event(models.Model):
@@ -58,6 +58,7 @@ class Poll(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=90, null=True)
+    description = models.TextField()
     start_date = models.DateTimeField()
     stop_date = models.DateTimeField()
     poll_option = models.JSONField(

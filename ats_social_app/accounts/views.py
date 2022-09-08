@@ -1,3 +1,5 @@
+import pycountry
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
@@ -12,11 +14,16 @@ from django.utils.encoding import force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CustomUserForm, UserEditForm
+from groups.models import Members, Posts, Comments, Replies, Group, GroupRequest
+from activities.models import Notification
+
 User = get_user_model()
+countries = list(pycountry.countries)
+
 
 # Create your views here.
-
-
+def home(request):
+    return render(request, 'home.html')
 
 
 def sign_up(request):
@@ -37,7 +44,7 @@ def sign_up(request):
 
         else:
             error = (form.errors.as_text()).split('*')
-            messages.error(request, error[len(error)-1])
+            messages.error(request, error[len(error) - 1])
             return render(request, "accounts/sign_up.html", )
 
     context = {"form": form,
@@ -47,7 +54,6 @@ def sign_up(request):
 
 
 def user_sign_in(request):
-
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -75,9 +81,48 @@ def user_sign_out(request):
 
 
 class UserProfile(DetailView):
+    
     model = User
-    context_object_name = 'user'
     template_name = 'accounts/profile_view.html'
+
+    def get_queryset(self, **kwargs):
+        return User.objects.get(id=kwargs["pk"])
+
+    def get_context_data(self, **kwargs):
+        post_created = []
+        comment_created = []
+        replies_created = []
+        group_requests = []
+        number_of_groups = Members.active_objects.filter(user_id=kwargs["pk"])
+        for member in number_of_groups:
+            for post in Posts.objects.all():
+                if member.id == post.member_id:
+                    post_created.append(member)
+
+        for member in number_of_groups:
+            for comment in Comments.active_objects.all():
+                if member.id == comment.member_id:
+                    comment_created.append(comment)
+
+        for member in number_of_groups:
+            for reply in Replies.active_objects.all():
+                if member.id == reply.member_id:
+                    replies_created.append(reply)
+
+        admin_for_request = Group.active_objects.filter(owner_id=kwargs["pk"])
+
+        for group in admin_for_request:
+            for request in GroupRequest.objects.all():
+                if group.id == request.group_id:
+                    group_requests.append(request)
+
+        context = super(UserProfile, self).get_context_data()
+        context["user"] = self.get_queryset()
+        context["groups"] = number_of_groups
+        context["posts"] = post_created
+        context["replies"] = replies_created
+        context["notification"] = Notification.objects.all(user_id=kwargs["pk"])
+        return context
 
 
 def user_edit_details(request, pk):
@@ -90,13 +135,17 @@ def user_edit_details(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Edit successfully")
-            return HttpResponseRedirect(reverse('accounts:profile', args=({'pk': pk})))
-        messages.error(request, f"Invalid entry")
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+        error = (form.errors.as_text()).split('*')
+        messages.error(request, error[len(error)-1])
+        return HttpResponseRedirect(reverse('accounts:profile', args=(pk,)))
+
+
 
     elif request.method == "GET":
         context = {
-            "form": form
+            "form": form,
+            'countries':  [country.name for country in countries]
         }
         return render(request, 'accounts/edit_profile.html', context)
 

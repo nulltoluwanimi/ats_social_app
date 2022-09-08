@@ -1,85 +1,168 @@
 {% extends 'base_generic.html' %}
-
-{% block content%}
-
-<div>  
-
-    <div class="mx-12 ">
-
-        <form class="" method="POST" enctype="multipart/form-data" action="">
-
-            {% csrf_token %}
-
-            {{ form.media }}
-
-            {{ form.as_p }}
-
-            <button class="bg-blue-500 py-4 px-4 m-2 text-white " type="submit">Create Post</button>
-
-        </form>
-
-
-
-            <h3>{{group.title}}</h3>
-
-            <small>{{group.owner}} created on {{group.date_created}}</small>
-
-
-
-            {% comment %} <img src="{{group.picture.url}}" alt="{{group.name}}"> {% endcomment %}
-
-
-
-
-            {% if group.is_closed %}
-
-            <p><strong>CLOSED</strong></p>
-
-            {% endif %}
-
-
-
-
-            <p>{{group.description}}</p>
-
-
-
-
-
-            {% for post in posts %}
-
-                  <h2> {{ post.title }}</h3>
-
-                    {{group.title|safe}} <!-- remove linebreaks -->
-
-                    <p>by {{post.member}} {{post.date_created | timesince }}</p>
-
-                   
-
-
-
-                    {% comment %} <img src="{{post.image.url}}" alt="{{post.title}}"> {% endcomment %}
-
-                  <p>{{ post.body|safe }}</p>
-
-                  <form action="" method="POST" enctype="multipart/form-data">
-{% comment %} 
-                    {% csrf_token %}
-
-                    {{form.as_p}}
-
-
-
-                  </form> {% endcomment %}
-
-            {% empty %}
-
-            <p>No Posts Available At the Moment</p>
-
-            {% endfor %}
-
+{% load static %}
+{% block content %}
+  <div class="mx-auto p-4 w-full flex flex-col">
+    <div class="tab">
+      <button class="tablinks" onclick="openCity(event, 'Post')">Post</button>
+      <button class="tablinks" onclick="openCity(event, 'Paris')">Poll</button>
+      <button class="tablinks" onclick="openCity(event, 'Tokyo')">Event</button>
+      <button class="tablinks" onclick="openCity(event, 'Notification')">Notifications</button>
     </div>
 
-</div>
+    <div id="Post" class="block w-full tabcontent">
+      <div class="flex">
+        <h3 class="text-2xl font-bold p-4">Posts</h3>
 
+        <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create A Post</button>
+      </div>
+      <div class="space-y-4 mt-4">
+        {% for post in open_posts %}
+          <div class="bg-gray-100 p-2">
+            <div class="flex justify-between space-x-2">
+              <div class="flex text-gray-500 text-base items-center">
+                <small>b/{{ post.group.name }}</small>
+                &nbsp;
+                <small class="font-light">•&nbsp;Posted by u/user {{ post.date_created|timesince }} ago</small>
+              </div>
+            </div>
+            <h3>{{ post.body|safe }}</h3>
+            <div class="flex items-center justify-end gap-4">
+              <i class="fa fa-heart-o"></i>
+              <i class="fa fa-eye-slash"></i>
+              <i class="fa fa-share-alt"></i>
+              <span class="flex gap-2"><i class="fa fa-comments-o"></i></span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div id="Paris" class="tabcontent">
+      <div class="flex">
+        <h3 class="text-2xl font-bold p-4">Polls</h3>
+        <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create A Polls</button>
+      </div>
+
+      <ul role="list" class="divide-y divide-gray-200">
+        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+          <div class="flex justify-between space-x-3">
+            <div class="min-w-0 flex-1">
+              <a href="#" class="block focus:outline-none">
+                <span class="absolute inset-0" aria-hidden="true"></span>
+                <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
+                <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
+              </a>
+            </div>
+            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">1d ago</time>
+          </div>
+          <div class="mt-1">
+            <p class="line-clamp-2 text-sm text-gray-600">Doloremque dolorem maiores assumenda dolorem facilis. Velit vel in a rerum natus facere. Enim rerum eaque qui facilis. Numquam laudantium sed id dolores omnis in. Eos reiciendis deserunt maiores et accusamus quod dolor.</p>
+          </div>
+        </li>
+        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+          <div class="flex justify-between space-x-3">
+            <div class="min-w-0 flex-1">
+              <a href="#" class="block focus:outline-none">
+                <span class="absolute inset-0" aria-hidden="true"></span>
+                <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
+                <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
+              </a>
+            </div>
+            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">1d ago</time>
+          </div>
+          <div class="mt-1">
+            <p class="line-clamp-2 text-sm text-gray-600">Doloremque dolorem maiores assumenda dolorem facilis. Velit vel in a rerum natus facere. Enim rerum eaque qui facilis. Numquam laudantium sed id dolores omnis in. Eos reiciendis deserunt maiores et accusamus quod dolor.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div id="Tokyo" class="tabcontent">
+      <div class="flex">
+        <h3 class="text-2xl font-bold p-4">Events</h3>
+        <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create An Event</button>
+      </div>
+
+      <ul role="list" class="divide-y divide-gray-200">
+        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+          <div class="flex justify-between space-x-3">
+            <div class="min-w-0 flex-1">
+              <a href="#" class="block focus:outline-none">
+                <span class="absolute inset-0" aria-hidden="true"></span>
+                <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
+                <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
+              </a>
+            </div>
+            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">1d ago</time>
+          </div>
+          <div class="mt-1">
+            <p class="line-clamp-2 text-sm text-gray-600">Doloremque dolorem maiores assumenda dolorem facilis. Velit vel in a rerum natus facere. Enim rerum eaque qui facilis. Numquam laudantium sed id dolores omnis in. Eos reiciendis deserunt maiores et accusamus quod dolor.</p>
+          </div>
+        </li>
+        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+          <div class="flex justify-between space-x-3">
+            <div class="min-w-0 flex-1">
+              <a href="#" class="block focus:outline-none">
+                <span class="absolute inset-0" aria-hidden="true"></span>
+                <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
+                <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
+              </a>
+            </div>
+            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">1d ago</time>
+          </div>
+          <div class="mt-1">
+            <p class="line-clamp-2 text-sm text-gray-600">Doloremque dolorem maiores assumenda dolorem facilis. Velit vel in a rerum natus facere. Enim rerum eaque qui facilis. Numquam laudantium sed id dolores omnis in. Eos reiciendis deserunt maiores et accusamus quod dolor.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div id="Notification" class="tabcontent">
+      <div class="flex">
+        <h3 class="text-2xl font-bold p-4">Group Notification</h3>
+      </div>
+
+      <div class="p-5 mb-4 bg-gray-50 rounded-lg border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+        <time class="text-lg font-semibold text-gray-900 dark:text-white">January 13th, 2022</time>
+        <ol class="mt-3 divide-y divider-gray-200 dark:divide-gray-700">
+          <li>
+            <a href="#" class="block items-center p-3 sm:flex hover:bg-gray-100 dark:hover:bg-gray-700">
+              <div class="text-gray-600 dark:text-gray-400">
+                <div class="text-base font-normal">
+                  <span class="font-medium text-gray-900 dark:text-white">Jese Leos</span> likes <span class="font-medium text-gray-900 dark:text-white">Bonnie Green's</span> post in <span class="font-medium text-gray-900 dark:text-white">How to start with Flowbite library</span>
+                </div>
+                <div class="text-sm font-normal">"I wanted to share a webinar zeroheight."</div>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="block items-center p-3 sm:flex hover:bg-gray-100 dark:hover:bg-gray-700">
+              <div>
+                <div class="text-base font-normal text-gray-600 dark:text-gray-400">
+                  <span class="font-medium text-gray-900 dark:text-white">Bonnie Green</span> react to <span class="font-medium text-gray-900 dark:text-white">Thomas Lean's</span> comment
+                </div>
+              </div>
+            </a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <div class="mx-12"></div>
+
+  <script>
+    function openCity(evt, cityName) {
+      var i, tabcontent, tablinks
+      tabcontent = document.getElementsByClassName('tabcontent')
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = 'none'
+      }
+      tablinks = document.getElementsByClassName('tablinks')
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(' active', '')
+      }
+      document.getElementById(cityName).style.display = 'block'
+      evt.currentTarget.className += ' active'
+    }
+  </script>
 {% endblock %}

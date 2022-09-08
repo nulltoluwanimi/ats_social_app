@@ -6,6 +6,15 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 
 
 class GroupCreateForm(forms.ModelForm):
+    name_of_group = forms.CharField(widget=forms.TextInput
+                            (attrs={'placeholder': f'Group Name', 'class':
+                                    'border rounded-[10px] w-[483px] h-[43px] pl-[20px] mt-[5px] bg-[#FBFBFB] outline-none '}))
+    title = forms.CharField(widget=forms.TextInput
+                            (attrs={'placeholder': f'Group Title', 'class':
+                                    'border rounded-[10px] w-[483px] h-[43px] pl-[20px] mt-[15px] bg-[#FBFBFB] outline-none '}))
+    description = forms.CharField(widget=forms.Textarea(attrs={'placeholder': f'Group Description', 'class':
+                                    'border rounded-[10px] pl-[20px] mt-[15px] bg-[#FBFBFB] outline-none ', 'cols': 70, 'rows': 10}))
+
     class Meta:
         model = Group
         exclude = ("owner", "date_created",
@@ -26,7 +35,7 @@ class PostForm(forms.ModelForm):
         fields = ("body",)
         widgets = {
             "body": CKEditor5Widget(
-                attrs={"class": "django_ckeditor_5", "value": f"body"}, config_name="extends"
+                attrs={"class": "django_ckeditor_5 w-1/2", "value": f"body"}, config_name="extends"
             )
         }
 
@@ -34,10 +43,10 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comments
-        field = ("content",)
+        fields = ("content",)
         
 
 class ReplyForm(forms.ModelForm):
     class Meta:
         model = Replies
-        field = ("content",) 
+        fields = ("content",) 

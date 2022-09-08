@@ -9,24 +9,37 @@ from accounts.models import User
 from .models import Comments, Group, Posts, Members, Likes, Replies, GroupRequest
 from .forms import GroupCreateForm, PostForm, ReplyForm
 from activities.models import Notification
+# from activities.forms import EventCreateForm, PollForms
+
 
 
 # Create your views here.
 
-def home(request):
-    search = request.GET.get("search") if request.GET.get(
-        "search") is not None else ""
 
-    list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
-                                                 | Q(owner_first_name__icontains=search) | Q(
-        owner_last_name__icontains=search)
-                                                 )
 
+# def home(request):
+#     # search = request.GET.get("search") if request.GET.get(
+#     #     "search") is not None else ""
+
+#     # list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
+#     #                                              | Q(owner__full_name__icontains=search))
+
+#     # context = {
+#     #     "list_of_groups": list_of_groups
+#     # }
+#     return render(request, "home.html")
+
+def group_test(request):
     context = {
-        "list_of_groups": list_of_groups
+        'post_form': PostForm(),
+        # 'poll_form': PollForms(),
+        # 'event_form': EventCreateForm()
+        
     }
-    return render(request, "", context)
+    return render(request, "groups/group_edit.html",context )
 
+# def group_test(request):
+#     return render(request, "groups/group_timeline.html", )
 
 @login_required(login_url="accounts:sign_in")
 def group_details(request, pk, id):
@@ -63,8 +76,11 @@ def group_details(request, pk, id):
             user=group.members_set.filter()
         )
         notification.save()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-        return HttpResponseRedirect(reverse())
+    error = (post_form.errors.as_text()).split("*")
+    messages.error(request, error[len(error) - 1])
+    return HttpResponseRedirect(reverse())
 
 
 @login_required(login_url="accounts:sign_in")
@@ -75,19 +91,16 @@ def create_group(request, pk):
         form = GroupCreateForm(request.POST, request.FILES)
 
         if form.is_valid():
-            # creator = form.save(commit=False)
-            # creator.owner = User.objects.get(id=pk)
 
-            # creator.save()
-            new_group = Group.objects.create(owner=request.user, name_of_group=form.cleaned_data['name_of_group'],
-                                             title=form.cleaned_data['title'],
-                                             description=form.cleaned_data['description'])
+            new_group = Group(owner=request.user, name_of_group=form.cleaned_data['name_of_group'],
+                               title=form.cleaned_data['title'], description=form.cleaned_data['description'])
+
             new_group.save()
             print(new_group.id)
             group_admin = Members.objects.create(
                 group=Group.objects.get(pk=new_group.id),  # STILL CHECK LATER
                 member=request.user,
-                is_admin=True,
+
             )
 
             group_admin.save()
@@ -186,7 +199,6 @@ def join_group(request, pk, id):
             group=group,
             request_message=f"{new_member.username} wants to join {group.title}"
         )
-
         request.save()
 
         notification = Notification.objects.create(
@@ -209,7 +221,35 @@ def join_group(request, pk, id):
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
+
 @login_required(login_url="accounts:sign_in")
+def accept_request_closed_group(request, pk, id):
+    specific_request = GroupRequest.objects.get(id=id)
+
+    new_member = Members.objects.create(
+        group=Group.active_objects.get(group_id=specific_request.group_id),
+        member=User.objects.get(id=specific_request.user_id)
+    )
+    new_member.save()
+
+    return HttpResponseRedirect(reverse(request.META.get("HTTP_REFERER")))
+
+
+def reject_request_closed_group(request, pk, id):
+    specific_request = GroupRequest.objects.get(id=id)
+
+    notification = Notification.objects.create(
+        user=User.objects.get(id=specific_request.user_id),
+        group=Group.active_objects.get(id=specific_request.group_id),
+        content=f"Your Request to join '{specific_request.group}' has been rejected, Sorry!"
+    )
+
+    notification.save()
+
+    return HttpResponseRedirect(reverse(request.META.get("HTTP_REFERER")))
+
+
+
 def exit_group(request, pk, id):
     member = Members.active_objects.get(user_id=pk, group_id=id)
     member.is_active = False
@@ -227,6 +267,7 @@ def exit_group(request, pk, id):
     return HttpResponseRedirect(reverse("groups:home"))
 
 
+
 @login_required(login_url="accounts:sign_in")
 def create_reply(request, pk, id, _id):
     form = ReplyForm()
@@ -242,8 +283,18 @@ def create_reply(request, pk, id, _id):
 
             return
 
+def list_of_groups(request):
+    search = request.GET.get("search") if request.GET.get(
+        "search") is not None else ""
+
+    list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
+                                                  | Q(owner_first_name__icontains=search) | Q(
+        owner_last_name__icontains=search)
+                                                  )
+
+
     context = {
-        "form": form
+        "form": list_of_groups
     }
     return
 

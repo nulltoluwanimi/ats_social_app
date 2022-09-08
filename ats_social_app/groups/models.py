@@ -73,7 +73,7 @@ class GroupRequest(models.Manager):
 class Members(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_admin = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
     is_suspended = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 

@@ -41,6 +41,9 @@ def create_event(request, pk, id):
             
             messages.success(request, "Event Created Successfuly")
             return
+        error = (form.errors.as_text()).split("*")
+        messages.error(request, error[len(error) - 1])
+
     
     context = {
         "form": form
@@ -62,6 +65,8 @@ def edit_event(request, pk, id, _id):
             
             
             return
+        error = (form.errors.as_text()).split("*")
+        messages.error(request, error[len(error) - 1])
     
     context = {
         "form": form,
@@ -147,10 +152,10 @@ def create_polls(request, pk, id):
                 stop_date=form.cleaned_data.get("stop_date"),
                 
                 #Tolu, There is an issue here , Kindly Check and Rectify
-                polls_option=Poll.polls_option[form.cleaned_data["polls_option1"]]=0,
-                polls_option=Poll.polls_option[form.cleaned_data["polls_option2"]]=0,
-                polls_option=Poll.polls_option[form.cleaned_data["polls_option3"]]=0,
-                polls_option=Poll.polls_option[form.cleaned_data["polls_option4"]]=0,
+                # polls_option=Poll.polls_option[form.cleaned_data["polls_option1"]]=0,
+                # polls_option=Poll.polls_option[form.cleaned_data["polls_option2"]]=0,
+                # polls_option=Poll.polls_option[form.cleaned_data["polls_option3"]]=0,
+                # polls_option=Poll.polls_option[form.cleaned_data["polls_option4"]]=0,
             )
            new_poll.save()
            
