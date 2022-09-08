@@ -1,0 +1,13 @@
+asgiref==3.5.2
+backports.zoneinfo==0.2.1
+Django==4.1
+django-ckeditor==6.5.1
+django-ckeditor-5==0.1.8
+django-js-asset==2.0.0
+django-phonenumber-field==6.4.0
+phonenumbers==8.12.54
+Pillow==9.2.0
+psycopg2==2.9.3
+pycountry==22.3.5
+sqlparse==0.4.2
+tzdata==2022.2

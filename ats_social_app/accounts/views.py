@@ -3,7 +3,7 @@ import pycountry
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib import messages
-from django.views.generic import DetailView, View
+from django.views.generic import DetailView, View, ListView
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
@@ -80,20 +80,20 @@ def user_sign_out(request):
     return render(request, 'accounts/sign_in.html')
 
 
-class UserProfile(DetailView):
-    
+class UserProfile(ListView):
     model = User
     template_name = 'accounts/profile_view.html'
 
     def get_queryset(self, **kwargs):
-        return User.objects.get(id=kwargs["pk"])
+        return User.objects.filter(id=self.kwargs["pk"]).first()
 
     def get_context_data(self, **kwargs):
         post_created = []
         comment_created = []
         replies_created = []
         group_requests = []
-        number_of_groups = Members.active_objects.filter(user_id=kwargs["pk"])
+        user_notifications = []
+        number_of_groups = Members.active_objects.filter(member_id=self.kwargs["pk"])
         for member in number_of_groups:
             for post in Posts.objects.all():
                 if member.id == post.member_id:
@@ -109,19 +109,30 @@ class UserProfile(DetailView):
                 if member.id == reply.member_id:
                     replies_created.append(reply)
 
-        admin_for_request = Group.active_objects.filter(owner_id=kwargs["pk"])
+        admin_for_request = Group.active_objects.filter(owner_id=self.kwargs["pk"])
+
+        if admin_for_request is not None:
+            a_creator = True
 
         for group in admin_for_request:
-            for request in GroupRequest.objects.all():
+            for request in GroupRequest.active_objects.all():
                 if group.id == request.group_id:
                     group_requests.append(request)
+
+        for all_not in Notification.objects.all():
+            print(all_not.user.all())
+            for user_pk in all_not.user.all():
+                if self.kwargs["pk"] == user_pk.id:
+                    user_notifications.append(all_not)
 
         context = super(UserProfile, self).get_context_data()
         context["user"] = self.get_queryset()
         context["groups"] = number_of_groups
         context["posts"] = post_created
         context["replies"] = replies_created
-        context["notification"] = Notification.objects.all(user_id=kwargs["pk"])
+        context["notification"] = user_notifications
+        context["a_creator"] = a_creator
+        context["requests"] = group_requests
         return context
 
 
@@ -137,7 +148,7 @@ def user_edit_details(request, pk):
             messages.success(request, "Edit successfully")
 
         error = (form.errors.as_text()).split('*')
-        messages.error(request, error[len(error)-1])
+        messages.error(request, error[len(error) - 1])
         return HttpResponseRedirect(reverse('accounts:profile', args=(pk,)))
 
 
@@ -145,7 +156,7 @@ def user_edit_details(request, pk):
     elif request.method == "GET":
         context = {
             "form": form,
-            'countries':  [country.name for country in countries]
+            'countries': [country.name for country in countries]
         }
         return render(request, 'accounts/edit_profile.html', context)
 

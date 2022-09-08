@@ -2,12 +2,36 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0d84a30e-ae8d-4a0f-a2cc-09363cd1f59f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/ats_social_app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ats_social_app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/profile_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/profile_view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/templates/accounts/sign_in.html" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/templates/accounts/sign_in.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/activities/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/migrations/0002_events_polls_start_date_polls_stop_date_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/migrations/0003_alter_events_maybe_alter_events_no_alter_events_yes.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/migrations/0004_rename_events_event_rename_polls_poll_and_more.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/activities/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/activities/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/activities/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/activities/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ats_social_app/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ats_social_app/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ats_social_app/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/ats_social_app/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/migrations/0002_alter_comments_options_alter_groups_options_and_more.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/migrations/0003_alter_posts_body.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/migrations/0004_rename_groups_group_likes_post_and_more.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/groups/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/groups/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/templates/groups/create_group.html" beforeDir="false" afterPath="$PROJECT_DIR$/groups/templates/groups/create_group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/templates/groups/group_edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/groups/templates/groups/group_edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/templates/groups/group_timeline.html" beforeDir="false" afterPath="$PROJECT_DIR$/groups/templates/groups/group_timeline.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/groups/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/groups/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/groups/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/groups/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base_generic.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base_generic.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,13 +50,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/AbrahamGrahamAdekunl/Desktop/ats_social_app/ats_social_app&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/AbrahamGrahamAdekunl/Desktop/nnn/ats_social_app",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -43,5 +69,16 @@
       <updated>1662125420846</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

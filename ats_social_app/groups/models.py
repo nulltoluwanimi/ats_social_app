@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django_ckeditor_5.fields import CKEditor5Field
 
 from accounts.models import User
-User = get_user_model()
 
 
 class ActiveManager(models.Manager):
@@ -56,7 +55,7 @@ class Group(models.Model):
         verbose_name_plural = 'groups'
 
 
-class GroupRequest(models.Manager):
+class GroupRequest(models.Model):
     STATUS_CHOICES = (
         ("ACCEPTED", "ACCEPTED"),
         ("REJECTED", "REJECTED"),
@@ -68,6 +67,14 @@ class GroupRequest(models.Manager):
     status = models.CharField(choices=STATUS_CHOICES,
                               max_length=15, null=True, default="INITIATED")
     time_stamp = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    active_objects = ActiveManager()
+    inactive_objects = InactiveManager()
+
+    class Meta:
+        unique_together = ("user", "group", "is_active")
 
 
 class Members(models.Model):
@@ -84,11 +91,12 @@ class Members(models.Model):
     not_suspended_objects = NotSuspendedMember()
 
     def __str__(self):
-        return self.member.full_name
+        return self.member.username
 
     class Meta:
         verbose_name = 'member'
         verbose_name_plural = 'members'
+        unique_together = ("group", "member", "is_active")
 
 
 class Posts(models.Model):
