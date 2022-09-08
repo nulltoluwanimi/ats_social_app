@@ -34,6 +34,8 @@ def group_test(request):
         'post_form': PostForm(),
         # 'poll_form': PollForms(),
         # 'event_form': EventCreateForm()
+
+
         
     }
     return render(request, "groups/group_edit.html",context )
