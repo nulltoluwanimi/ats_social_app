@@ -12,6 +12,68 @@
             <a href="{% url 'accounts:edit_details' request.user.id %}"><button class="bg-blue-400 rounded-full text-white p-4" type="">Edit Profile</button></a>
             <a href="{% url 'accounts:home'  %}"><button class="bg-blue-400 rounded-full text-white p-4" type="">Home</button></a>
         </div>
+
+         <div>
+             <h3>Participating groups</h3>
+             {% if groups.count > 1 %}
+
+             <h5>{{ groups.count }}</h5>
+             {% else %}
+             <p>No Groups Yet</p>
+             {% endif %}
+         </div>
+
+        <br>
+         <br>
+         <div>
+             <h3>Posts Created</h3>
+             <h5>{{ posts.count }}</h5>
+             {% for post in posts %}
+             <P>{{post}}</P>
+             {% empty %}
+             <p>No Posts Yet</p>
+             {% endfor %}
+         </div>
+
+
+         <br>
+         <br>
+         <div>
+             <h3>Replies</h3>
+             <h5>{{ replies.count }}</h5>
+             {% for reply in repliess %}
+             <P>{{reply}}</P>
+             {% empty %}
+             <p>No Reply Yet</p>
+             {% endfor %}
+         </div>
+
+
+         <br>
+         <br>
+         <div>
+             <h3>Notification</h3>
+             <h5>{{ user_notifications.count }}</h5>
+             {% for notification in user_notifications  %}
+             <P>{{notification}}</P>
+             {% empty %}
+             <p>No Notifications Yet</p>
+             {% endfor %}
+         </div>
+
+         {% if a_creator %}
+         <div>
+             <h3>Group Request</h3>
+             <h5>{{ user_notifications.count }}</h5>
+             {% for g_request in requests %}
+             <p>{{g_request.request_message}}</p>
+             <a href="{% url 'groups:accept_closed_group' request.user.id g_request.group.id %}"><button type="submit">Accept</button></a>
+             <a href="{% url 'groups:reject_closed_group' request.user.id g_request.group.id %}"><button type="submit">Reject</button></a>
+             {% empty %}
+             <p>No Group Request Yet</p>
+             {% endfor %}
+         </div>
+         {% endif %}
     </div>
         </div>
 {% endblock %}

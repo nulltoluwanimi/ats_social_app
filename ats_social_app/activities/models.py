@@ -2,7 +2,7 @@ from email.policy import default
 from django.db import models
 
 from accounts.models import User
-from groups.models import Group, SuspendedMember, NotSuspendedMember
+from groups.models import Group, SuspendedMember, NotSuspendedMember, Posts, Replies, Likes
 
 # Create your models here.
 
@@ -19,17 +19,18 @@ class NotStartedEvent(models.Manager):
         return super().get_queryset().filter(is_started=False)
 
 
-def _json():
-    return dict
-
-
-def _json_list():
-    return list
+# def _json():
+#     return dict
+#
+#
+# def _json_list():
+#     return list
 
 
 class Notification(models.Model):
-    user = models.ManyToManyField(User, null=True)
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
+    user = models.ManyToManyField(User, related_name="notification_users")
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
+    title = models.TextField()
     content = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
     is_admin_notification = models.BooleanField(default=False)
@@ -45,9 +46,13 @@ class Event(models.Model):
     time_end = models.DateTimeField(null=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     is_started = models.BooleanField(default=False)
-    yes = models.JSONField(default=_json_list(), null=True, blank=True)
-    no = models.JSONField(default=_json_list(), null=True, blank=True)
-    maybe = models.JSONField(default=_json_list(), null=True, blank=True)
+    # yes = models.JSONField(default=_json_list(), null=True, blank=True)
+    # no = models.JSONField(default=_json_list(), null=True, blank=True)
+    # maybe = models.JSONField(default=_json_list(), null=True, blank=True)
+
+    yes = models.ManyToManyField(User, related_name="event_yes")
+    no = models.ManyToManyField(User, related_name="event_no")
+    maybe = models.ManyToManyField(User, related_name="event_maybe")
 
     objects = models.Manager()
     started_objects = StartedEvent()
@@ -61,5 +66,12 @@ class Poll(models.Model):
     description = models.TextField()
     start_date = models.DateTimeField()
     stop_date = models.DateTimeField()
-    poll_option = models.JSONField(
-        default=_json(), help_text="Maximum of 4 Options")
+    # poll_option = models.JSONField(
+    #     default=_json(), help_text="Maximum of 4 Options")
+
+    poll_option_1 = models.ManyToManyField(User, related_name="poll_1")
+    poll_option_2 = models.ManyToManyField(User, related_name="poll_2")
+    poll_option_3 = models.ManyToManyField(User, related_name="poll_3")
+    poll_option_4 = models.ManyToManyField(User, related_name="poll_4")
+
+

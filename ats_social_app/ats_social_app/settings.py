@@ -136,7 +136,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 
 PHONENUMBER_DB_FORMAT = "INTERNATIONAL"
-PHONENUMBER_DB_FORMAT = "INTERNATIONAL"
+PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
 
 customColorPalette = [
     {"color": "hsl(4, 90%, 58%)", "label": "Red"},

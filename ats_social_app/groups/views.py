@@ -8,13 +8,13 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import User
 from .models import Comments, Group, Posts, Members, Likes, Replies, GroupRequest
 from .forms import GroupCreateForm, PostForm, ReplyForm
-from activities.models import Notification
+from activities.models import Notification, Event, Poll
+
+
 # from activities.forms import EventCreateForm, PollForms
 
 
-
 # Create your views here.
-
 
 
 # def home(request):
@@ -29,14 +29,15 @@ from activities.models import Notification
 #     # }
 #     return render(request, "home.html")
 
-def group_test(request):
-    context = {
-        'post_form': PostForm(),
-        # 'poll_form': PollForms(),
-        # 'event_form': EventCreateForm()
-        
-    }
-    return render(request, "groups/group_edit.html",context )
+# def group_test(request):
+#     context = {
+#         'post_form': PostForm(),
+#         # 'poll_form': PollForms(),
+#         # 'event_form': EventCreateForm()
+#
+#     }
+#     return render(request, "groups/group_edit.html", context)
+
 
 # def group_test(request):
 #     return render(request, "groups/group_timeline.html", )
@@ -44,11 +45,18 @@ def group_test(request):
 @login_required(login_url="accounts:sign_in")
 def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
-    member = Members.not_suspended_objects.get(user_id=pk, group_id=id)
+    check_member = Members.not_suspended_objects.filter(member_id=pk, group_id=id).first()
+    notifications = Notification.objects.filter(group_id=id)
     posts = Posts.objects.filter(group=group)
+    group_events = Event.objects.filter(group_id=id)
+    group_polls = Poll.objects.filter(group_id=id)
+    list_of_members = Members.active_objects.filter(group_id=id)
+    suspended_members = Members.suspended_objects.filter(group_id=id)
 
-    if member is not None:
-        if member.is_suspended:
+    print()
+
+    if check_member is not None:
+        if check_member.is_suspended:
             post_form = "You are not allowed to post"
 
         else:
@@ -58,29 +66,38 @@ def group_details(request, pk, id):
         context = {
             "group": group,
             "posts": posts,
-            "form": post_form
+            "form": post_form,
+            "events": group_events,
+            "group_polls": group_polls,
+            "members": list_of_members,
+            "notifications": notifications,
+            "check_member": check_member,
+            "suspended_members": suspended_members
         }
 
-        return render(request, "", context)
+        return render(request, "groups/group_edit.html", context)
     post_form = PostForm(request.POST)
 
     if post_form.is_valid():
         post = post_form.save(commit=False)
-        post.member = member
+        post.member = check_member
         post.group = group
         post.save()
 
         notification = Notification.objects.create(
             group=group,
-            content=f"{member.user.username} created a post group",
-            user=group.members_set.filter()
+            content=f"{check_member.user.username} created a post group",
+            title=f"New post in {group}",
         )
+
+        for members in group.members_set.filter(is_active=True, is_suspended=False):
+            notification.user.add(members.member)
         notification.save()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     error = (post_form.errors.as_text()).split("*")
     messages.error(request, error[len(error) - 1])
-    return HttpResponseRedirect(reverse())
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="accounts:sign_in")
@@ -91,19 +108,30 @@ def create_group(request, pk):
         form = GroupCreateForm(request.POST, request.FILES)
 
         if form.is_valid():
-
-            new_group = Group(owner=request.user, name_of_group=form.cleaned_data['name_of_group'],
-                               title=form.cleaned_data['title'], description=form.cleaned_data['description'])
+            new_group = Group(owner=User.objects.get(id=pk), name_of_group=form.cleaned_data['name_of_group'],
+                              title=form.cleaned_data['title'], description=form.cleaned_data['description'],
+                              is_closed=form.cleaned_data["is_closed"])
 
             new_group.save()
             print(new_group.id)
             group_admin = Members.objects.create(
                 group=Group.objects.get(pk=new_group.id),  # STILL CHECK LATER
-                member=request.user,
-
+                member=User.objects.get(id=pk),
+                is_admin=True,
             )
 
             group_admin.save()
+
+            notification = Notification.objects.create(
+                content=f"{new_group.title} group created by {new_group.owner.username}",
+                title=f"New Group Created",
+                group=new_group,
+
+            )
+
+            notification.user.add(User.objects.get(id=pk))
+
+            notification.save()
             return HttpResponseRedirect(reverse('accounts:home'))
         error = (form.errors.as_text()).split('*')
         messages.error(request, error[len(error) - 1])
@@ -130,6 +158,19 @@ def make_admin(request, pk, id, _id):
             Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
         member.is_admin = True
         member.save()
+
+        notification = Notification.objects.create(
+            content=f"{group.title} group assigned {member.member.username} as a group administrator",
+            title=f"New Admin Assigned",
+            group=group,
+
+        )
+
+        for members in group.members_set.filter(is_active=True, is_suspended=False):
+            notification.user.add(members.member)
+
+        notification.save()
+
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.error(request, "Admin can not be more than 3")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -150,6 +191,20 @@ def remove_as_admin(request, pk, id, _id):
             Q(user_id=User.objects.get(id=id).id) & Q(group=group))
         member.is_admin = False
         member.save()
+
+        notification = Notification.objects.create(
+            content=f"{group.title} group removed {member.member.username} as a group administrator",
+            title=f" Admin Removed",
+            group=group,
+
+        )
+
+        for members in group.members_set.filter(is_active=True, is_suspended=False):
+            notification.user.add(members.member)
+
+        notification.save()
+
+        messages.success(request, f"{member.member.username} removed as admin successfully")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.error(request, "Admin can not be less than 1")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -168,6 +223,20 @@ def remove_member_of_group(request, pk, id, _id):
         Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
     member.is_active = False
     member.save()
+
+    notification = Notification.objects.create(
+        content=f"The admin removed {member.member.username}",
+        title=f"Member removed",
+        group=group,
+
+    )
+
+    for members in group.members_set.filter(is_active=True, is_suspended=False):
+        notification.user.add(members.member)
+
+    notification.save()
+
+    messages.success(request, f"{member.member.username} removed from {group} successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -185,6 +254,45 @@ def suspend_member(request, pk, id, _id):
         Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
     member.is_suspended = True
     member.save()
+
+    notification = Notification.objects.create(
+        content=f"You have been suspended from {group}",
+        title=f"Suspension",
+
+    )
+
+    notification.user.add(member.member)
+
+    notification.save()
+    messages.success(request, f"{member.member.username} suspended successfully")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+
+@login_required(login_url="accounts:sign_in")
+def unsuspend_member(request, pk, id, _id):
+    group = Group.objects.get(id=pk)
+    member = Members.objects.get(user_id=pk, group_id=id)
+
+    if member.is_admin:
+        pass
+    else:
+        return HttpResponseForbidden()
+
+    member = Members.objects.get(
+        Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
+    member.is_suspended = False
+    member.save()
+
+    notification = Notification.objects.create(
+        content=f"Your suspension in {group} has been lifted",
+        title=f"Suspension Lifted",
+
+    )
+
+    notification.user.add(member.member)
+
+    notification.save()
+    messages.success(request, f"{member.member.username} suspension lifted successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -194,32 +302,59 @@ def join_group(request, pk, id):
     group = Group.objects.get(id=id)
 
     if group.is_closed:
-        request = GroupRequest.objects.create(
-            user=new_member,
+        for member in group.members_set.all():
+            if member.member_id == pk:
+                messages.info(request, f"You are already a member of {group.name_of_group}")
+                return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+        # checker_2 = GroupRequest.active_objects.get(user_id=pk, group_id=group.id).first()
+        # if checker_2 is not None:
+        #     messages.error(request, "A group request has been sent to the owner of the group")
+        #     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+        group_request = GroupRequest.objects.create(
+            user=User.objects.get(id=pk),
             group=group,
             request_message=f"{new_member.username} wants to join {group.title}"
         )
-        request.save()
+        group_request.save()
 
         notification = Notification.objects.create(
             group=group,
-            content=f"{new_member.user.username} left the group",
-            user=group.members_set.filter(is_admin=True),
+            content=f"{new_member.username} wants to join the group",
             is_admin_notification=True,
         )
+
+        for folks in group.members_set.all():
+            notification.user.add(folks.member)
+
         notification.save()
-        messages.success(
-            request, "A request has been sent to the Admin of the group")
+
+        messages.success(request, "A request has been sent to the Admin of the group")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     else:
+
+        for member in group.members_set.all():
+            if member.member_id == pk:
+                messages.info(request, f"You are already a member of {group.name_of_group}")
+                return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
         member = Members.objects.create(
             member=new_member,
             group=group
         )
         member.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+        messages.success(request, f"you have joined '{group.name_of_group}' successfully")
+        notification = Notification.objects.create(
+            group=group,
+            content=f"{new_member.username} has joined the group",
 
+        )
+        for folks in group.members_set.all():
+            notification.user.add(folks.member)
+        notification.save()
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="accounts:sign_in")
@@ -227,27 +362,40 @@ def accept_request_closed_group(request, pk, id):
     specific_request = GroupRequest.objects.get(id=id)
 
     new_member = Members.objects.create(
-        group=Group.active_objects.get(group_id=specific_request.group_id),
+        group=Group.active_objects.get(id=specific_request.group_id),
         member=User.objects.get(id=specific_request.user_id)
     )
     new_member.save()
+
+    specific_request.is_active = False
+    specific_request.save()
+
+    notification = Notification.objects.create(
+        content=f"Your Request to join '{specific_request.group}' has been accepted",
+        title=f"Group Request"
+    )
+    notification.user.add(User.objects.get(id=specific_request.user_id))
+    notification.save()
 
     return HttpResponseRedirect(reverse(request.META.get("HTTP_REFERER")))
 
 
 def reject_request_closed_group(request, pk, id):
-    specific_request = GroupRequest.objects.get(id=id)
+    specific_request = GroupRequest.active_objects.get(id=id)
+
+    specific_request.is_active = False
+    specific_request.save()
 
     notification = Notification.objects.create(
-        user=User.objects.get(id=specific_request.user_id),
-        group=Group.active_objects.get(id=specific_request.group_id),
+        title=f"Group Request",
         content=f"Your Request to join '{specific_request.group}' has been rejected, Sorry!"
     )
+    notification.user.add(User.objects.get(id=specific_request.user_id))
 
     notification.save()
 
-    return HttpResponseRedirect(reverse(request.META.get("HTTP_REFERER")))
-
+    messages.success(request, "request, rejected successfully")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 def exit_group(request, pk, id):
@@ -258,14 +406,15 @@ def exit_group(request, pk, id):
     group = Group.active_objects.get(id=id)
 
     notification = Notification.objects.create(
-            group=group,
-            content=f"{member.user.username} left the group",
-            user=group.members_set.filter(is_admin_notification=True),
-            is_admin_notification=True
+        group=group,
+        content=f"{member.user.username} left the {group}",
+        is_admin_notification=True
     )
+
+    for members in group.members_set.filter(is_active=True, is_suspended=False):
+        notification.user.add(members.member)
     notification.save()
     return HttpResponseRedirect(reverse("groups:home"))
-
 
 
 @login_required(login_url="accounts:sign_in")
@@ -283,15 +432,15 @@ def create_reply(request, pk, id, _id):
 
             return
 
+
 def list_of_groups(request):
     search = request.GET.get("search") if request.GET.get(
         "search") is not None else ""
 
     list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
-                                                  | Q(owner_first_name__icontains=search) | Q(
+                                                 | Q(owner_first_name__icontains=search) | Q(
         owner_last_name__icontains=search)
-                                                  )
-
+                                                 )
 
     context = {
         "form": list_of_groups

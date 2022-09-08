@@ -67,7 +67,9 @@
   <header class="bg-white sticky top-0">
     <nav class="flex justify-between items-center py-2 px-4 space-x-8">
       <div class="flex">
+        <a href="{% url 'accounts:home' %}">
         <img class="mx-auto h-12 w-auto" src="{% static 'icons/sunrays.png' %}" alt="icons" />
+        </a>
 
       </div>
       <div class="flex border-2 rounded-lg justify-center items-center h-fit bg-gray-200 px-4 w-1/2">
@@ -100,14 +102,14 @@
 
           {% else %}
           <div class="flex gap-4 ">
-            {% comment %} <a href="{% url 'accounts:sign_out'%}">
+             <a href="{% url 'accounts:sign_out'%}">
               <button
                 class="bg-blue-500 mt-2 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0">
                 Logout
               </button>
-            </a> {% endcomment %}
+            </a>
             <div>
-              <a href={% url 'accounts:edit_details' request.user.id %}>
+              <a href={% url 'accounts:profile' request.user.id %}>
                 <img class="w-10 h-10 rounded-full" src="{{ user.profile_picture.url }}" alt="">
                 <span
                   class="top-0 left-7 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
@@ -136,7 +138,7 @@
           </div>
         </div>
         <div class="space-y-2">
-          <p class="text-[15px] font-bold capitalize">RECENT COMMUNITIES</p>
+          <p class="text-[15px] font-bold capitalize">RECENT GROUPS</p>
           {% comment %} <div class="text-[14px] font-light text-black space-y-2">
             {% for group in recently_created_groups %}
             <div>
@@ -169,18 +171,18 @@
                     class="bg-blue-500 w-20 hover:bg-blue-700 align-left
                     item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
                     >
-                    <a href="{%  url 'groups:group_test'  %}">
+                    <a href="{%  url 'groups:group' request.user.id group.id  %}">
                     Enter
                     </button></a>
-                   
+
                     {% elif group.is_closed %}
                     <button  id="group-action"
                     class="bg-blue-500 w-20 hover:bg-blue-700 align-left
                     item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
                     >
-                    {% comment %} <a href="{%  url 'groups:group' group.id 'request' %}"> {% endcomment %}
+                    <a href="{%  url 'groups:join_group' request.user.id group.id %}">
                     Request
-                    </button></a>
+                    </a></button>
                     <div id="large-modal" tabindex="-1"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
                     <div class="relative p-4 w-full max-w-4xl h-full md:h-auto">
@@ -227,7 +229,7 @@
                       <button
                       class="bg-blue-500 w-20 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
                       >
-                      {% comment %} <a href="{%  url 'groups:group' group.id 'join' %}"> {% endcomment %}
+                      <a href="{%  url 'groups:join_group' request.user.id group.id %}">
                       Join</a>
                       </button>
                 

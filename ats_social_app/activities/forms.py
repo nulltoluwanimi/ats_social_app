@@ -1,7 +1,7 @@
 
 from django import forms
 
-from activities.views import polls_option1
+
 
 from .models import Event
 
@@ -17,6 +17,6 @@ class PollForms(forms.Form):
     start_date = forms.DateTimeField(required=True)
     stop_date = forms.DateTimeField(required=True)
     polls_option1 = forms.CharField(max_length=50, required=True)
-    polls_option1 = forms.CharField(max_length=50, required=True)
-    polls_option1 = forms.CharField(max_length=50,)
-    polls_option1 = forms.CharField(max_length=50)
+    polls_option2 = forms.CharField(max_length=50, required=True)
+    polls_option3 = forms.CharField(max_length=50,)
+    polls_option4 = forms.CharField(max_length=50)

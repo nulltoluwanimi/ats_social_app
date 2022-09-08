@@ -4,15 +4,16 @@ from . import views
 
 app_name = "groups"
 urlpatterns = [
-    path("groups_test/", views.group_test, name="group_test"),
+    # path("groups_test/", views.group_test, name="group_test"),
     path("<int:pk>/create-group/", views.create_group, name="create-group"),
     path('<int:pk>/group/<int:id>/', views.group_details, name="group"),
     path('<int:pk>/group/<int:id>/make_admin/<int:_id>', views.make_admin, name="make_admin"),
     path('<int:pk>/group/<int:id>/remove_admin/<int:_id>', views.remove_as_admin, name="remove_as_admin"),
-    path('<int:pk>/group/<int:id>/suspend_member/<int:_id>', views.remove_as_admin, name="remove_as_admin"),
+    path('<int:pk>/group/<int:id>/suspend_member/<int:_id>', views.suspend_member, name="suspend_member"),
+    path('<int:pk>/group/<int:id>/unsuspend_member/<int:_id>', views.unsuspend_member, name="unsuspend_member"),
     path('<int:pk>/group/<int:id>/remove_member/<int:_id>', views.remove_member_of_group, name="remove_member"),
     
-    path("<int:pk>/join-group/", views.join_group, name="join_group"),
+    path("<int:pk>/join-group/<int:id>", views.join_group, name="join_group"),
     path("<int:pk>/group/<int:id>/exit_group", views.exit_group, name="exit_group"),
     
     path("<int:pk>/group/<int:id>/comment/<int:_id>/reply/", views.create_reply, name="create_reply"),
@@ -25,8 +26,8 @@ urlpatterns = [
     path("<int:pk>/group/<int:id>/comment/<int:_id>/hide/", views.hide_comment, name="hide_comment"),
     path("<int:pk>/group/<int:id>/reply/<int:_id>/hide/", views.hide_reply, name="hide_reply"),
     path("<int:pk>/group/<int:id>/post/<int:_id>/hide/", views.hide_post, name="hide_post"),
-    path("<int:pk>/group_request/<int:id>/", views.accept_request_closed_group, name="join_closed_group"),
-    path("<int:pk>/group_request/<int:id>/", views.reject_request_closed_group, name="reject_closed_group")
+    path("<int:pk>/accept_group_request/<int:id>/", views.accept_request_closed_group, name="accept_closed_group"),
+    path("<int:pk>/reject_request/<int:id>/", views.reject_request_closed_group, name="reject_closed_group")
     
 
 ]
