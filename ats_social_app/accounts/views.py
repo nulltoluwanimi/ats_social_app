@@ -88,40 +88,29 @@ class UserProfile(ListView):
         return User.objects.filter(id=self.kwargs["pk"]).first()
 
     def get_context_data(self, **kwargs):
-        post_created = []
-        comment_created = []
-        replies_created = []
-        group_requests = []
         user_notifications = User.objects.get(id=self.kwargs["pk"]).notification_users.all()
+
         number_of_groups = Members.active_objects.filter(member_id=self.kwargs["pk"])
 
-        for_post = number_of_groups.objects.filter().values_list("group_id")
-        print(for_post)
+        member_id_check = number_of_groups.filter().values_list("id")
 
-        for member in number_of_groups:
-            for post in Posts.objects.all():
-                if member.id == post.member_id:
-                    post_created.append(post)
+        post_created = Posts.objects.filter(member_id__in=member_id_check)
 
-        for member in number_of_groups:
-            for comment in Comments.active_objects.all():
-                if member.id == comment.member_id:
-                    comment_created.append(comment)
+        comment_created = Comments.active_objects.filter(member_id__in=member_id_check)
 
-        for member in number_of_groups:
-            for reply in Replies.active_objects.all():
-                if member.id == reply.member_id:
-                    replies_created.append(reply)
+        replies_created = Replies.active_objects.filter(member_id__in=member_id_check)
 
-        admin_for_request = Group.active_objects.filter(owner_id=self.kwargs["pk"])
+        try:
+            admin_for_request = Group.active_objects.filter(owner_id=self.kwargs["pk"]).values_list("id")
 
-        if admin_for_request is not None:
-            a_creator = True
+            if admin_for_request is not None:
+                a_creator = True
+                group_requests = GroupRequest.active_objects.filter(group_id__in=admin_for_request)
+        except:
+            group_requests = []
 
-        for group in admin_for_request:
-            for request in GroupRequest.active_objects.all():
-                if group.id == request.group_id:
-                    group_requests.append(request)
+
+
 
         context = super(UserProfile, self).get_context_data()
         context["user"] = self.get_queryset()
@@ -130,6 +119,7 @@ class UserProfile(ListView):
         context["replies"] = replies_created
         context["notifications"] = user_notifications
         context["a_creator"] = a_creator
+        context["comments"] = comment_created
         context["requests"] = group_requests
         return context
 
