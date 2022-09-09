@@ -29,7 +29,9 @@
       <div class="flex">
         <h3 class="text-2xl font-bold p-4">Posts</h3>
 
+          {% if check_member %}
         <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit"><a href="{% url 'groups:create_post' request.user.id group.id %}">Create A Post</a></button>
+          {% endif %}
       </div>
       <div class="space-y-4 mt-4">
         {% for post in posts %}
@@ -167,21 +169,27 @@
                 <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
 <!--              </a>-->
             </div>
-            {% if check_member.is_admin %}
+            {% if check_member.is_admin  %}
+              <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
             <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
-              <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Remove</button>
+              Remove
             </a>
+              </button>
 
                 {% if not member.is_suspended %}
+                <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
                   <a href="{% url 'groups:suspend_member' request.user.id group.id member.member.id  %}">
-                    <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Suspend</button>
+                    Suspend
                   </a>
+                    </button>
 
 
                     {% if not member.is_admin %}
+                    <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
                      <a href="{% url 'groups:make_admin' request.user.id group.id member.id %}">
-                   <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Make Admin</button>
+                   Make Admin
                     </a>
+                    </button>
                     {% endif %}
                 {% endif %}
             {% endif %}
