@@ -48,7 +48,7 @@ def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
     check_member = Members.not_suspended_objects.filter(member_id=pk, group_id=id).first()
     notifications = Notification.objects.filter(group_id=id)
-    posts = Posts.objects.filter(group=group).order_by('date_created')
+    posts = Posts.objects.filter(group=group)
     group_events = Event.objects.filter(group_id=id)
     group_polls = Poll.objects.filter(group_id=id)
     list_of_members = Members.active_objects.filter(group_id=id)
@@ -313,10 +313,11 @@ def join_group(request, pk, id):
         group_request.save()
 
         notification = Notification.objects.create(
-            group=group,
-            content=f"{new_member.username} wants to join the group",
-
+            content=f"{new_member.username} wants to join {group.title}",
         )
+
+        for members in group.member_set.filter(is_admin=True):
+            notification.user.add(members.member)
 
         notification.save()
 
@@ -338,6 +339,7 @@ def join_group(request, pk, id):
         messages.success(request, f"you have joined '{group.name_of_group}' successfully")
         notification = Notification.objects.create(
             group=group,
+            title="New Member",
             content=f"{new_member.username} has joined the group",
 
         )
@@ -375,7 +377,7 @@ def reject_request_closed_group(request, pk, id):
     specific_request.save()
 
     notification = Notification.objects.create(
-        title=f"Group Request",
+        title=f"Rejected Group Request",
         content=f"Your Request to join '{specific_request.group}' has been rejected, Sorry!"
     )
     notification.user.add(User.objects.get(id=specific_request.user_id))
@@ -445,7 +447,7 @@ def like_post(request, pk, id, _id):
         notification = Notification.objects.create(
             group=Group.active_objects.get(id=id),
             title=f"{post_like.post.title}",
-            content=f"{post_like.member.member.username} liked the post'{post_like.post.title}'",
+            content=f"{post_like.member.member.username} liked the post '{post_like.post.title}' ",
         )
 
         notification.user.add(User.objects.get(id=post_like.member.member.id))
@@ -516,7 +518,8 @@ def create_post(request, pk, id):
             new_post = Posts(member=Members.active_objects.get(id=pk),
                              group=Group.active_objects.get(id=id),
                              title=form.cleaned_data['title'],
-                             body=form.cleaned_data['body'])
+                             body=form.cleaned_data['body'],
+                             )
             new_post.save()
             return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
         error = (form.errors.as_text()).split('*')

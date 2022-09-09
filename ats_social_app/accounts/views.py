@@ -92,12 +92,12 @@ class UserProfile(ListView):
         comment_created = []
         replies_created = []
         group_requests = []
-        user_notifications = []
+        user_notifications = User.objects.get(id=self.kwargs["pk"]).notification_users.all()
         number_of_groups = Members.active_objects.filter(member_id=self.kwargs["pk"])
         for member in number_of_groups:
             for post in Posts.objects.all():
                 if member.id == post.member_id:
-                    post_created.append(member)
+                    post_created.append(post)
 
         for member in number_of_groups:
             for comment in Comments.active_objects.all():
@@ -119,18 +119,12 @@ class UserProfile(ListView):
                 if group.id == request.group_id:
                     group_requests.append(request)
 
-        for all_not in Notification.objects.all():
-            print(all_not.user.all())
-            for user_pk in all_not.user.all():
-                if self.kwargs["pk"] == user_pk.id:
-                    user_notifications.append(all_not)
-
         context = super(UserProfile, self).get_context_data()
         context["user"] = self.get_queryset()
         context["groups"] = number_of_groups
         context["posts"] = post_created
         context["replies"] = replies_created
-        context["notification"] = user_notifications
+        context["notifications"] = user_notifications
         context["a_creator"] = a_creator
         context["requests"] = group_requests
         return context

@@ -4,6 +4,7 @@ from django.db import models
 from accounts.models import User
 from groups.models import Group, SuspendedMember, NotSuspendedMember, Posts, Replies, Likes
 
+
 # Create your models here.
 
 
@@ -34,6 +35,12 @@ class Notification(models.Model):
     content = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
     is_admin_notification = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-time_stamp',)
+
+    def __str__(self):
+        return self.title
 
 
 class Event(models.Model):
@@ -69,9 +76,12 @@ class Poll(models.Model):
     # poll_option = models.JSONField(
     #     default=_json(), help_text="Maximum of 4 Options")
 
-    poll_option_1 = models.ManyToManyField(User, related_name="poll_1")
-    poll_option_2 = models.ManyToManyField(User, related_name="poll_2")
-    poll_option_3 = models.ManyToManyField(User, related_name="poll_3")
-    poll_option_4 = models.ManyToManyField(User, related_name="poll_4")
+    poll_option_1_tag = models.CharField(max_length=40, null=True, blank=True)
+    poll_option_2_tag = models.CharField(max_length=40, null=True, blank=True)
+    poll_option_3_tag = models.CharField(max_length=40, null=True, blank=True)
+    poll_option_4_tag = models.CharField(max_length=40, null=True, blank=True)
 
-
+    poll_option_1_count = models.ManyToManyField(User, related_name="poll_1")
+    poll_option_2_count = models.ManyToManyField(User, related_name="poll_2")
+    poll_option_3_count = models.ManyToManyField(User, related_name="poll_3")
+    poll_option_4_count = models.ManyToManyField(User, related_name="poll_4")
