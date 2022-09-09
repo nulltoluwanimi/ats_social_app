@@ -1,32 +1,31 @@
 {% extends 'base_generic.html' %}
 {% load static %}
      {%  block content %}
-     <div class="account_info">
+     <div class="account_info p-8">
         <div class="inner_info">
             <img width="50px" height="50px" src="{{user.profile_picture.url}}" alt="{{user.username}}">
-          <p>Welcome, {{user.username}}</p>
-          <p>{{user.email}}</p>
+          <p class="font-bold text-xl" >Welcome, {{user.username}}</p>
+          <p class="text-base opacity-50 text-grqay-300">{{user.email}}</p>
             <br>
             <br>
-            <h2>My Beam Account</h2>
-            <a href="{% url 'accounts:edit_details' request.user.id %}"><button class="bg-blue-400 rounded-full text-white p-4" type="">Edit Profile</button></a>
-            <a href="{% url 'accounts:home'  %}"><button class="bg-blue-400 rounded-full text-white p-4" type="">Home</button></a>
+            <h2 class="font-bold text-xl">My Beam Account</h2>
+            <a href="{% url 'accounts:edit_details' request.user.id %}"><button class="bg-blue-500 rounded-lg text-white p-2" type="">Edit Profile</button></a>
+            <a href="{% url 'accounts:home'  %}"><button class="bg-blue-500 rounded-lg text-white p-2" type="">Home</button></a>
         </div>
 
-         <div>
+         <div class="flex flex-col mt-2  ">
              <h3>Participating groups</h3>
              {% if groups.count > 1 %}
 
-             <h5>{{ groups.count }}</h5>
+             <h5>{{ groups.count }} groups</h5>
              {% else %}
              <p>No Groups Yet</p>
              {% endif %}
          </div>
 
-        <br>
-         <br>
-         <div>
+         <div class="flex flex-col mt-2">
              <h3>Posts Created</h3>
+             {% comment %} {{posts}} {% endcomment %}
              <h5>{{ posts.count }}</h5>
              {% for post in posts %}
              <P>{{post}}</P>
@@ -37,8 +36,8 @@
 
 
          <br>
-         <br>
-         <div>
+
+         <div class="flex flex-col mt-2">
              <h3>Replies</h3>
              <h5>{{ replies.count }}</h5>
              {% for reply in repliess %}
@@ -48,10 +47,9 @@
              {% endfor %}
          </div>
 
-
          <br>
-         <br>
-         <div>
+  
+         <div class="flex flex-col mt-2">
              <h3>Notification</h3>
              <h5>{{ user_notifications.count }}</h5>
              {% for notification in user_notifications  %}

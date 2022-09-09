@@ -16,11 +16,12 @@ urlpatterns = [
     path("<int:pk>/join-group/<int:id>", views.join_group, name="join_group"),
     path("<int:pk>/group/<int:id>/exit_group", views.exit_group, name="exit_group"),
     
+    path("<int:pk>/create/post/<int:id>/", views.create_post, name="create_post"),
     path("<int:pk>/group/<int:id>/comment/<int:_id>/reply/", views.create_reply, name="create_reply"),
     
     path("<int:pk>/group/<int:id>/comment/<int:_id>/like/", views.like_comment, name="like_comment"),
     path("<int:pk>/group/<int:id>/reply/<int:_id>/like/", views.like_reply, name="like_reply"),
-    path("<int:pk>/group/<int:id>/post/<int:_id>/like/", views.like_post, name="like_post"),
+    path("<int:pk>/group/post/<int:_id>/like/", views.like_post, name="like_post"),
     
     
     path("<int:pk>/group/<int:id>/comment/<int:_id>/hide/", views.hide_comment, name="hide_comment"),

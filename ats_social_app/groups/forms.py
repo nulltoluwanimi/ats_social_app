@@ -22,6 +22,10 @@ class GroupCreateForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
+    
+    title = forms.CharField(widget=forms.TextInput
+                            (attrs={'placeholder': f'Group Title', 'class':
+                                    'border rounded-[10px] w-[483px] h-[43px] pl-[20px] mt-[15px] bg-[#FBFBFB] outline-none '}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,7 +36,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Posts
-        fields = ("body",)
+        fields = ("title","body",)
         widgets = {
             "body": CKEditor5Widget(
                 attrs={"class": "django_ckeditor_5 w-1/2", "value": f"body"}, config_name="extends"

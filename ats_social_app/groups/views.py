@@ -49,11 +49,12 @@ def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
     check_member = Members.not_suspended_objects.filter(member_id=pk, group_id=id).first()
     notifications = Notification.objects.filter(group_id=id)
-    posts = Posts.objects.filter(group=group)
+    posts = Posts.objects.filter(group=group).order_by('date_created')
     group_events = Event.objects.filter(group_id=id)
     group_polls = Poll.objects.filter(group_id=id)
     list_of_members = Members.active_objects.filter(group_id=id)
     suspended_members = Members.suspended_objects.filter(group_id=id)
+    group_admin = Members.objects.filter(is_admin=True)
 
     print()
 
@@ -74,7 +75,8 @@ def group_details(request, pk, id):
             "members": list_of_members,
             "notifications": notifications,
             "check_member": check_member,
-            "suspended_members": suspended_members
+            "suspended_members": suspended_members,
+            "group_admin": group_admin,
         }
 
         return render(request, "groups/group_edit.html", context)
@@ -168,9 +170,6 @@ def make_admin(request, pk, id, _id):
 
         )
 
-        for members in group.members_set.filter(is_active=True, is_suspended=False):
-            notification.user.add(members.member)
-
         notification.save()
 
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -200,10 +199,6 @@ def remove_as_admin(request, pk, id, _id):
             group=group,
 
         )
-
-        for members in group.members_set.filter(is_active=True, is_suspended=False):
-            notification.user.add(members.member)
-
         notification.save()
 
         messages.success(request, f"{member.member.username} removed as admin successfully")
@@ -232,9 +227,6 @@ def remove_member_of_group(request, pk, id, _id):
         group=group,
 
     )
-
-    for members in group.members_set.filter(is_active=True, is_suspended=False):
-        notification.user.add(members.member)
 
     notification.save()
 
@@ -324,11 +316,8 @@ def join_group(request, pk, id):
         notification = Notification.objects.create(
             group=group,
             content=f"{new_member.username} wants to join the group",
-            is_admin_notification=True,
-        )
 
-        for folks in group.members_set.all():
-            notification.user.add(folks.member)
+        )
 
         notification.save()
 
@@ -340,7 +329,7 @@ def join_group(request, pk, id):
         for member in group.members_set.all():
             if member.member_id == pk:
                 messages.info(request, f"You are already a member of {group.name_of_group}")
-                return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+                return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
 
         member = Members.objects.create(
             member=new_member,
@@ -353,10 +342,8 @@ def join_group(request, pk, id):
             content=f"{new_member.username} has joined the group",
 
         )
-        for folks in group.members_set.all():
-            notification.user.add(folks.member)
         notification.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+        return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
 
 
 @login_required(login_url="accounts:sign_in")
@@ -410,11 +397,9 @@ def exit_group(request, pk, id):
     notification = Notification.objects.create(
         group=group,
         content=f"{member.user.username} left the {group}",
-        is_admin_notification=True
     )
 
-    for members in group.members_set.filter(is_active=True, is_suspended=False):
-        notification.user.add(members.member)
+
     notification.save()
     return HttpResponseRedirect(reverse("groups:home"))
 
@@ -451,8 +436,9 @@ def list_of_groups(request):
 
 
 @login_required(login_url="accounts:sign_in")
-def like_post(request, pk, id, _id):
-    post_like = Likes.active_objects.get(member_id=pk, post_id=_id)
+def like_post(request, pk, _id):
+    post_like = Likes.objects.get(Qmember_id=pk, post_id=_id)
+    # posts = get_object_or_404(Post, slug=slug)
 
     if post_like is not None:
         post_like.is_active = False
@@ -462,7 +448,8 @@ def like_post(request, pk, id, _id):
     else:
         post_like = Likes.objects.create(
             member=Members.active_objects.get(id=pk),
-            post=Comments.active_objects.get(id=_id)
+            post=Comments.active_objects.get(id=_id),
+            is_active=True
         )
         post_like.save()
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -470,7 +457,8 @@ def like_post(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def like_comment(request, pk, id, _id):
-    comment_like = Likes.active_objects.get(member_id=pk, comment_id=_id)
+    comment_like = Likes.objects.get(member_id=pk, comment_id=_id)
+    
 
     if comment_like is not None:
         comment_like.is_active = False
@@ -502,6 +490,35 @@ def like_reply(request, pk, id, _id):
         )
         reply_like.save()
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    
+@login_required(login_url="accounts:sign_in")
+def create_post(request, pk, id):
+    
+    form = PostForm()
+    
+    user = Members.objects.get(pk=pk)
+    if user.is_suspended:
+        messages.error(request, "You can't perform that action, please message admin")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        
+
+    if request.method == "POST":
+        form = PostForm(request.POST)
+
+        if form.is_valid():
+            new_post = Posts(member=Members.active_objects.get(id=pk), 
+                              group=Group.active_objects.get(id=id),
+                            title=form.cleaned_data['title'], 
+                            body=form.cleaned_data['body'])
+            new_post.save()
+            return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
+        error = (form .errors.as_text()).split('*')
+        messages.error(request, error[len(error)-1])
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    context = {
+        'form': form,
+    }
+    return render(request, 'groups/post_create.html', context)
 
 
 @login_required(login_url="accounts:sign_in")
