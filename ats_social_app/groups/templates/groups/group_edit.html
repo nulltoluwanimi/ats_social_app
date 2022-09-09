@@ -44,7 +44,7 @@
             <h2 class = "font-semibold text-base">{{post.title}}</h2>
             <h3 class="p-2">{{ post.body|safe }}</h3>
             <div class="flex items-center justify-end gap-4">
-              <a href="{% url 'groups:like_post' request.user.id post.id   %}"><i class="fa fa-heart-o"></i></a>
+              <a href="{% url 'groups:like_post' request.user.id group.id post.id   %}"><i class="fa fa-heart-o"></i></a>
               {% if request.user in group_admin %}
               <i class="fa fa-eye-slash"></i>
               {% endif %}

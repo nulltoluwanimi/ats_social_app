@@ -21,7 +21,7 @@ urlpatterns = [
     
     path("<int:pk>/group/<int:id>/comment/<int:_id>/like/", views.like_comment, name="like_comment"),
     path("<int:pk>/group/<int:id>/reply/<int:_id>/like/", views.like_reply, name="like_reply"),
-    path("<int:pk>/group/post/<int:_id>/like/", views.like_post, name="like_post"),
+    path("<int:pk>/group/<int:id>/post/<int:_id>/like/", views.like_post, name="like_post"),
     
     
     path("<int:pk>/group/<int:id>/comment/<int:_id>/hide/", views.hide_comment, name="hide_comment"),

@@ -134,6 +134,9 @@ class Comments(models.Model):
         verbose_name = 'comment'
         verbose_name_plural = 'comments'
 
+    def __str__(self):
+        return self.post.title
+
 
 class Replies(models.Model):
     member = models.ForeignKey(Members, on_delete=models.SET_NULL, null=True)
@@ -149,6 +152,9 @@ class Replies(models.Model):
     class Meta:
         verbose_name = 'replies'
         verbose_name_plural = 'replies'
+
+    def __str__(self):
+        return self.comment
 
 
 class Likes(models.Model):
@@ -168,3 +174,6 @@ class Likes(models.Model):
     class Meta:
         verbose_name = 'like'
         verbose_name_plural = 'likes'
+
+    def __str__(self):
+        return self.member.member.username

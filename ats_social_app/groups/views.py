@@ -40,7 +40,6 @@ from activities.models import Notification, Event, Poll
 #     return render(request, "groups/group_edit.html", context)
 
 
-
 # def group_test(request):
 #     return render(request, "groups/group_timeline.html", )
 
@@ -399,7 +398,6 @@ def exit_group(request, pk, id):
         content=f"{member.user.username} left the {group}",
     )
 
-
     notification.save()
     return HttpResponseRedirect(reverse("groups:home"))
 
@@ -436,84 +434,93 @@ def list_of_groups(request):
 
 
 @login_required(login_url="accounts:sign_in")
-def like_post(request, pk, _id):
-    post_like = Likes.objects.get(Qmember_id=pk, post_id=_id)
-    # posts = get_object_or_404(Post, slug=slug)
+def like_post(request, pk, id, _id):
+    post_like = Likes.objects.get_or_create(member_id=pk, post_id=_id)[0]
+    print(post_like)
 
-    if post_like is not None:
-        post_like.is_active = False
-        post_like.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    post_like.is_active = not post_like.is_active
+    post_like.save()
 
-    else:
-        post_like = Likes.objects.create(
-            member=Members.active_objects.get(id=pk),
-            post=Comments.active_objects.get(id=_id),
-            is_active=True
+    if post_like.is_active:
+        notification = Notification.objects.create(
+            group=Group.active_objects.get(id=id),
+            title=f"{post_like.post.title}",
+            content=f"{post_like.member.member.username} liked the post'{post_like.post.title}'",
         )
-        post_like.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+        notification.user.add(User.objects.get(id=post_like.member.member.id))
+        notification.save()
+        messages.success(request, f"{post_like.post.title} liked successfully")
+    else:
+        messages.success(request, f"{post_like.post.title} unliked successfully")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="accounts:sign_in")
 def like_comment(request, pk, id, _id):
-    comment_like = Likes.objects.get(member_id=pk, comment_id=_id)
-    
+    comment_like = Likes.objects.get_or_create(member_id=pk, comment_id=_id)[0]
 
-    if comment_like is not None:
-        comment_like.is_active = False
-        comment_like.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    comment_like.is_active = not comment_like.is_active
+    comment_like.save()
 
-    else:
-        comment_like = Likes.objects.create(
-            member=Members.active_objects.get(id=pk),
-            comment=Comments.active_objects.get(id=_id)
+    if comment_like.is_active:
+        notification = Notification.objects.create(
+            group=Group.active_objects.get(id=id),
+            title=f"{comment_like.post.title}",
+            content=f"{comment_like.member.member.username} liked a comment in '{comment_like.comment}'",
         )
-        comment_like.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+        notification.user.add(User.objects.get(id=comment_like.member.member.id))
+        notification.save()
+        messages.success(request, f"comment liked successfully")
+    else:
+        messages.success(request, f"comment unliked successfully")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="accounts:sign_in")
 def like_reply(request, pk, id, _id):
-    reply_like = Likes.active_objects.get(member_id=pk, reply_id=_id)
+    reply_like = Likes.objects.get_or_create(member_id=pk, reply_id=_id)[0]
 
-    if reply_like is not None:
-        reply_like.is_active = False
-        reply_like.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    reply_like.is_active = not reply_like.is_active
+    reply_like.save()
 
-    else:
-        reply_like = Likes.objects.create(
-            member=Members.active_objects.get(id=pk),
-            reply=Comments.active_objects.get(id=_id)
+    if reply_like.is_active:
+        notification = Notification.objects.create(
+            group=Group.active_objects.get(id=id),
+            title=f"{reply_like.post.title}",
+            content=f"{reply_like.member.member.username} liked a reply to a comment in'{reply_like.reply}'",
         )
-        reply_like.save()
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    
+
+        notification.user.add(User.objects.get(id=reply_like.member.member.id))
+        notification.save()
+        messages.success(request, f"{reply_like.post.title} liked successfully")
+    else:
+        messages.success(request, f"{reply_like.post.title} unliked successfully")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+
 @login_required(login_url="accounts:sign_in")
 def create_post(request, pk, id):
-    
     form = PostForm()
-    
+
     user = Members.objects.get(pk=pk)
     if user.is_suspended:
         messages.error(request, "You can't perform that action, please message admin")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-        
 
     if request.method == "POST":
         form = PostForm(request.POST)
 
         if form.is_valid():
-            new_post = Posts(member=Members.active_objects.get(id=pk), 
-                              group=Group.active_objects.get(id=id),
-                            title=form.cleaned_data['title'], 
-                            body=form.cleaned_data['body'])
+            new_post = Posts(member=Members.active_objects.get(id=pk),
+                             group=Group.active_objects.get(id=id),
+                             title=form.cleaned_data['title'],
+                             body=form.cleaned_data['body'])
             new_post.save()
             return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
-        error = (form .errors.as_text()).split('*')
-        messages.error(request, error[len(error)-1])
+        error = (form.errors.as_text()).split('*')
+        messages.error(request, error[len(error) - 1])
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     context = {
         'form': form,
