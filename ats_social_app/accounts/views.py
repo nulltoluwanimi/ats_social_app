@@ -94,6 +94,10 @@ class UserProfile(ListView):
         group_requests = []
         user_notifications = User.objects.get(id=self.kwargs["pk"]).notification_users.all()
         number_of_groups = Members.active_objects.filter(member_id=self.kwargs["pk"])
+
+        for_post = number_of_groups.objects.filter().values_list("group_id")
+        print(for_post)
+
         for member in number_of_groups:
             for post in Posts.objects.all():
                 if member.id == post.member_id:

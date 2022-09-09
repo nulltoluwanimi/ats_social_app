@@ -18,7 +18,7 @@ def context(request):
         if request.user.is_authenticated:
             all_user_group = Members.objects.filter(member_id=request.user.id).values_list('group_id')
             context['user_group'] = Group.objects.filter(pk__in=all_user_group)
-            # print(context, all_user_group)
+            context["user_notifications"] = request.user.notification_users.all()
             context['not_user_groups'] = Group.objects.exclude(pk__in=all_user_group)[:10]
         return context
     except Exception as e:
