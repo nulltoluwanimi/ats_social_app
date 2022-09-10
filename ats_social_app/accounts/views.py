@@ -88,50 +88,38 @@ class UserProfile(ListView):
         return User.objects.filter(id=self.kwargs["pk"]).first()
 
     def get_context_data(self, **kwargs):
-        post_created = []
-        comment_created = []
-        replies_created = []
-        group_requests = []
-        user_notifications = []
+        user_notifications = User.objects.get(id=self.kwargs["pk"]).notification_users.all()
+
         number_of_groups = Members.active_objects.filter(member_id=self.kwargs["pk"])
-        for member in number_of_groups:
-            for post in Posts.objects.all():
-                if member.id == post.member_id:
-                    post_created.append(member)
 
-        for member in number_of_groups:
-            for comment in Comments.active_objects.all():
-                if member.id == comment.member_id:
-                    comment_created.append(comment)
+        member_id_check = number_of_groups.filter().values_list("id")
 
-        for member in number_of_groups:
-            for reply in Replies.active_objects.all():
-                if member.id == reply.member_id:
-                    replies_created.append(reply)
+        post_created = Posts.objects.filter(member_id__in=member_id_check)
 
-        admin_for_request = Group.active_objects.filter(owner_id=self.kwargs["pk"])
+        comment_created = Comments.active_objects.filter(member_id__in=member_id_check)
 
-        if admin_for_request is not None:
-            a_creator = True
+        replies_created = Replies.active_objects.filter(member_id__in=member_id_check)
 
-        for group in admin_for_request:
-            for request in GroupRequest.active_objects.all():
-                if group.id == request.group_id:
-                    group_requests.append(request)
+        try:
+            admin_for_request = Group.active_objects.filter(owner_id=self.kwargs["pk"]).values_list("id")
 
-        for all_not in Notification.objects.all():
-            print(all_not.user.all())
-            for user_pk in all_not.user.all():
-                if self.kwargs["pk"] == user_pk.id:
-                    user_notifications.append(all_not)
+            if admin_for_request is not None:
+                a_creator = True
+                group_requests = GroupRequest.active_objects.filter(group_id__in=admin_for_request)
+        except:
+            group_requests = []
+
+
+
 
         context = super(UserProfile, self).get_context_data()
         context["user"] = self.get_queryset()
         context["groups"] = number_of_groups
         context["posts"] = post_created
         context["replies"] = replies_created
-        context["notification"] = user_notifications
+        context["notifications"] = user_notifications
         context["a_creator"] = a_creator
+        context["comments"] = comment_created
         context["requests"] = group_requests
         return context
 

@@ -28,7 +28,7 @@
              {% comment %} {{posts}} {% endcomment %}
              <h5>{{ posts.count }}</h5>
              {% for post in posts %}
-             <P>{{post}}</P>
+             <P>{{post}} posted in {{post.group}}, {{post.date_created | timesince}} ago</P>
              {% empty %}
              <p>No Posts Yet</p>
              {% endfor %}
@@ -52,12 +52,17 @@
          <div class="flex flex-col mt-2">
              <h3>Notification</h3>
              <h5>{{ user_notifications.count }}</h5>
-             {% for notification in user_notifications  %}
-             <P>{{notification}}</P>
+             {% for notification in notifications  %}
+             <p>{{notification.title}}</p>
+             <p>{{notification.content}}, {{notification.time_stamp | timesince}} ago.</p>
+             <br>
              {% empty %}
              <p>No Notifications Yet</p>
              {% endfor %}
          </div>
+
+         <br>
+         <br>
 
          {% if a_creator %}
          <div>

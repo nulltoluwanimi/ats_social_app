@@ -48,59 +48,27 @@ def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
     check_member = Members.not_suspended_objects.filter(member_id=pk, group_id=id).first()
     notifications = Notification.objects.filter(group_id=id)
-    posts = Posts.objects.filter(group=group).order_by('date_created')
+    posts = Posts.objects.filter(group=group)
     group_events = Event.objects.filter(group_id=id)
     group_polls = Poll.objects.filter(group_id=id)
     list_of_members = Members.active_objects.filter(group_id=id)
     suspended_members = Members.suspended_objects.filter(group_id=id)
     group_admin = Members.objects.filter(is_admin=True)
 
-    print()
+    context = {
+        "group": group,
+        "posts": posts,
 
-    if check_member is not None:
-        if check_member.is_suspended:
-            post_form = "You are not allowed to post"
+        "events": group_events,
+        "group_polls": group_polls,
+        "members": list_of_members,
+        "notifications": notifications,
+        "check_member": check_member,
+        "suspended_members": suspended_members,
+        "group_admin": group_admin,
+    }
 
-        else:
-            post_form = PostForm()
-
-    if request.method == 'GET':
-        context = {
-            "group": group,
-            "posts": posts,
-            "form": post_form,
-            "events": group_events,
-            "group_polls": group_polls,
-            "members": list_of_members,
-            "notifications": notifications,
-            "check_member": check_member,
-            "suspended_members": suspended_members,
-            "group_admin": group_admin,
-        }
-
-        return render(request, "groups/group_edit.html", context)
-    post_form = PostForm(request.POST)
-
-    if post_form.is_valid():
-        post = post_form.save(commit=False)
-        post.member = check_member
-        post.group = group
-        post.save()
-
-        notification = Notification.objects.create(
-            group=group,
-            content=f"{check_member.user.username} created a post group",
-            title=f"New post in {group}",
-        )
-
-        for members in group.members_set.filter(is_active=True, is_suspended=False):
-            notification.user.add(members.member)
-        notification.save()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-    error = (post_form.errors.as_text()).split("*")
-    messages.error(request, error[len(error) - 1])
-    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    return render(request, "groups/group_edit.html", context)
 
 
 @login_required(login_url="accounts:sign_in")
@@ -313,10 +281,11 @@ def join_group(request, pk, id):
         group_request.save()
 
         notification = Notification.objects.create(
-            group=group,
-            content=f"{new_member.username} wants to join the group",
-
+            content=f"{new_member.username} wants to join {group.title}",
         )
+
+        for members in group.member_set.filter(is_admin=True):
+            notification.user.add(members.member)
 
         notification.save()
 
@@ -338,6 +307,7 @@ def join_group(request, pk, id):
         messages.success(request, f"you have joined '{group.name_of_group}' successfully")
         notification = Notification.objects.create(
             group=group,
+            title="New Member",
             content=f"{new_member.username} has joined the group",
 
         )
@@ -375,7 +345,7 @@ def reject_request_closed_group(request, pk, id):
     specific_request.save()
 
     notification = Notification.objects.create(
-        title=f"Group Request",
+        title=f"Rejected Group Request",
         content=f"Your Request to join '{specific_request.group}' has been rejected, Sorry!"
     )
     notification.user.add(User.objects.get(id=specific_request.user_id))
@@ -445,7 +415,7 @@ def like_post(request, pk, id, _id):
         notification = Notification.objects.create(
             group=Group.active_objects.get(id=id),
             title=f"{post_like.post.title}",
-            content=f"{post_like.member.member.username} liked the post'{post_like.post.title}'",
+            content=f"{post_like.member.member.username} liked the post '{post_like.post.title}' ",
         )
 
         notification.user.add(User.objects.get(id=post_like.member.member.id))
@@ -516,8 +486,19 @@ def create_post(request, pk, id):
             new_post = Posts(member=Members.active_objects.get(id=pk),
                              group=Group.active_objects.get(id=id),
                              title=form.cleaned_data['title'],
-                             body=form.cleaned_data['body'])
+                             body=form.cleaned_data['body'],
+                             )
             new_post.save()
+
+            notification = Notification.objects.create(
+                group=new_post.group,
+                content=f"{user.member.username} created a post group",
+                title=f"New post in {new_post.group}",
+            )
+
+            for members in new_post.group.members_set.filter(is_active=True, is_suspended=False):
+                notification.user.add(members.member)
+            notification.save()
             return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
         error = (form.errors.as_text()).split('*')
         messages.error(request, error[len(error) - 1])

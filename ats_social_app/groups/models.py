@@ -117,6 +117,10 @@ class Posts(models.Model):
     class Meta:
         verbose_name = 'post'
         verbose_name_plural = 'posts'
+        ordering = ('-date_created',)
+
+    def __str__(self):
+        return self.title
 
 
 class Comments(models.Model):
@@ -165,7 +169,7 @@ class Likes(models.Model):
     reply = models.ForeignKey(
         Replies, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     objects = models.Manager()
     active_objects = ActiveManager()
