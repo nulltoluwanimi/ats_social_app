@@ -1,0 +1,31 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block content %}
+  <div class="w-full my-8 p-4">
+    <div class="w-full">
+      {% include 'events.html' %}
+    </div>
+    <!-- Card -->
+    <div class="space-y-4 mt-4">
+      {% for post in open_posts %}
+        <div class="bg-gray-100 p-2">
+          <div class="flex justify-between space-x-2">
+            <div class="flex text-gray-500 text-base items-center">
+              <small>b/{{ post.group.name }}</small>
+              &nbsp;
+              <small class="font-light">•&nbsp;Posted by u/user {{ post.date_created|timesince }} ago</small>
+            </div>
+          </div>
+          <h3>{{ post.body|safe }}</h3>
+          <div class="flex items-center justify-end gap-4">
+            <i class="fa fa-heart-o"></i>
+            <i class="fa fa-share-alt"></i>
+            <span class="flex gap-2"><i class="fa fa-comments-o"></i></span>
+          </div>
+        </div>
+        {% empty %}
+        <h3>No posts available for the groups</h3>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

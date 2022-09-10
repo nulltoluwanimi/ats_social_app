@@ -1,0 +1,161 @@
+{% extends 'base_generic.html' %}
+
+{% block content%}
+
+<div class="mx-auto p-4  flex flex-col   ">
+
+  <h2>{{group.name_of_group}}</h2>
+  <small>{{group.owner}}</small>
+
+  {% if group.picture %}
+  <img src="{{group.picture.url}}" alt="{{group.name_of_group}}">
+  {% endif %}
+
+  <h3>{{members.count}} members available !</h3>
+
+  <p>{{group.title}}</p>
+
+  <div class="tab">
+    <button class="tablinks" onclick="openCity(event, 'Post')">Post</button>
+    <button class="tablinks" onclick="openCity(event, 'Poll')">Poll</button>
+    <button class="tablinks" onclick="openCity(event, 'Event')">Event</button>
+  </div>
+
+  <div id="Post" class="tabcontent">
+    <h3>{{group.name_of_group | title}}'s Posts</h3>
+
+    {% for post in Posts %}
+    <h3>{{post.title}}</h3>
+    {% if post.image %}
+    <img src="{{post.image.url}}" alt="{{post.member.username}}">
+    {% endif %}
+    <p>{{post.body}}</p>
+    <p>{{post.date_created}}</p>
+    {% empty %}
+    <p>No post yet</p>
+    {% endfor %}
+  
+  </div>
+
+  <div id="Poll" class="block tabcontent">
+    <h3>Polls</h3>
+
+    {% for g_poll in polls %}
+      <h4>{{g_poll.title}}</h4>
+      <small>Started by {{g_poll.creator}}</small>
+
+      <p>{{g_poll.description}}</p>
+      <br>
+    {% empty %}
+    <p>No Polls Yet</p>
+    {% endfor %}
+  </div>
+
+  <div id="Event" class="tabcontent">
+   <h3>Events</h3>
+
+    {% for event in events %}
+      <h4>{{event.title}}</h4>
+      <small>Started by {{event.creator}}</small>
+
+      <p>{{event.description}}</p>
+      <br>
+    {% empty %}
+    <p>No Event Yet</p>
+    {% endfor %}
+  </div>
+</div> <div class="mx-12 ">
+
+{% comment %} <form class="" method="POST" enctype="multipart/form-data" action="">
+
+  {% csrf_token %}
+
+  {{ form.media }}
+
+  {{ form.as_p }}
+
+  <button class="bg-blue-500 py-4 px-4 m-2 text-white " type="submit">Create Post</button>
+
+</form>
+
+
+
+<h3>{{group.title}}</h3>
+
+<small>{{group.owner}} created on {{group.date_created}}</small>
+
+
+
+{% comment %} <img src="{{group.picture.url}}" alt="{{group.name}}"> {% endcomment %}
+
+
+{% comment %}
+
+{% if group.is_closed %}
+
+<p><strong>CLOSED</strong></p>
+
+{% endif %}
+
+
+
+
+<p>{{group.description}}</p>
+
+
+
+
+
+{% for post in posts %}
+
+<h2> {{ post.title }}</h3>
+
+  {{group.title|safe}}
+  <!-- remove linebreaks -->
+
+  <p>by {{post.member}} {{post.date_created | timesince }}</p>
+
+
+
+
+
+  {% comment %} <img src="{{post.image.url}}" alt="{{post.title}}"> {% endcomment %}
+
+  {% comment %} <p>{{ post.body|safe }}</p> {% endcomment %}
+
+  {% comment %} <form action="" method="POST" enctype="multipart/form-data"> {% endcomment %}
+    {% comment %}
+    {% csrf_token %}
+
+    {{form.as_p}}
+
+
+
+  </form> {% endcomment %}
+
+  {% comment %} {% empty %} {% endcomment %}
+
+  {% comment %} <p>No Posts Available At the Moment</p> {% endcomment %}
+
+  {% comment %} {% endfor %} {% endcomment %}
+
+  {% comment %} </div> {% endcomment %}
+
+  </div>
+
+  <script>
+    function openCity(evt, cityName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  </script>
+  {% endblock %}

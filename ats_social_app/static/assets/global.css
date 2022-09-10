@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@font-face {
+  font-family: 'IBMPlexSans';
+  src: url(/src/assets/fonts/IBMPlexSans-Medium.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexSansLight';
+  src: url(/src/assets/fonts/IBMPlexSans-Regular.ttf) format('truetype');
+}
+.aside__dropdownUpArrow {
+  transition: all 0.3s ease-in-out;
+  transform: rotate(180deg);
+}
+.aside__showDropdown {
+  display: block;
+}
+.aside__dropdown ul {
+  display: none;
+}

@@ -1,0 +1,82 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+     {%  block content %}
+     <div class="account_info p-8">
+        <div class="inner_info">
+            <img width="50px" height="50px" src="{{user.profile_picture.url}}" alt="{{user.username}}">
+          <p class="font-bold text-xl" >Welcome, {{user.username}}</p>
+          <p class="text-base opacity-50 text-grqay-300">{{user.email}}</p>
+            <br>
+            <br>
+            <h2 class="font-bold text-xl">My Beam Account</h2>
+            <a href="{% url 'accounts:edit_details' request.user.id %}"><button class="bg-blue-500 rounded-lg text-white p-2" type="">Edit Profile</button></a>
+            <a href="{% url 'accounts:home'  %}"><button class="bg-blue-500 rounded-lg text-white p-2" type="">Home</button></a>
+        </div>
+
+         <div class="flex flex-col mt-2  ">
+             <h3>Participating groups</h3>
+             {% if groups.count > 1 %}
+
+             <h5>{{ groups.count }} groups</h5>
+             {% else %}
+             <p>No Groups Yet</p>
+             {% endif %}
+         </div>
+
+         <div class="flex flex-col mt-2">
+             <h3>Posts Created</h3>
+             {% comment %} {{posts}} {% endcomment %}
+             <h5>{{ posts.count }}</h5>
+             {% for post in posts %}
+             <P>{{post}} posted in {{post.group}}, {{post.date_created | timesince}} ago</P>
+             {% empty %}
+             <p>No Posts Yet</p>
+             {% endfor %}
+         </div>
+
+
+         <br>
+
+         <div class="flex flex-col mt-2">
+             <h3>Replies</h3>
+             <h5>{{ replies.count }}</h5>
+             {% for reply in repliess %}
+             <P>{{reply}}</P>
+             {% empty %}
+             <p>No Reply Yet</p>
+             {% endfor %}
+         </div>
+
+         <br>
+  
+         <div class="flex flex-col mt-2">
+             <h3>Notification</h3>
+             <h5>{{ user_notifications.count }}</h5>
+             {% for notification in notifications  %}
+             <p>{{notification.title}}</p>
+             <p>{{notification.content}}, {{notification.time_stamp | timesince}} ago.</p>
+             <br>
+             {% empty %}
+             <p>No Notifications Yet</p>
+             {% endfor %}
+         </div>
+
+         <br>
+         <br>
+
+         {% if a_creator %}
+         <div>
+             <h3>Group Request</h3>
+             <h5>{{ user_notifications.count }}</h5>
+             {% for g_request in requests %}
+             <p>{{g_request.request_message}}</p>
+             <a href="{% url 'groups:accept_closed_group' request.user.id g_request.group.id %}"><button type="submit">Accept</button></a>
+             <a href="{% url 'groups:reject_closed_group' request.user.id g_request.group.id %}"><button type="submit">Reject</button></a>
+             {% empty %}
+             <p>No Group Request Yet</p>
+             {% endfor %}
+         </div>
+         {% endif %}
+    </div>
+        </div>
+{% endblock %}

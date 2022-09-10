@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{% static 'style/style.css' %}"/>
+  <title>For Beam Groups</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+
+      {
+      % comment %
+    }
+
+    @font-face {
+      font-family: 'IBMPlexSans';
+      src: url() format('truetype');
+    }
+
+    @font-face {
+      font-family: 'IBMPlexSansLight';
+      src: url(/src/assets/fonts/IBMPlexSans-Regular.ttf) format('truetype');
+    }
+
+      {
+      % endcomment %
+    }
+
+    body {
+      font-family: 'Fira Sans', sans-serif;
+    }
+
+    .aside__dropdownUpArrow {
+      transition: all 0.3s ease-in-out;
+      transform: rotate(180deg);
+    }
+
+    .aside__showDropdown {
+      display: block;
+    }
+
+    .aside__dropdown ul {
+      display: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+
+      scrollbar-width: none;
+    }
+  </style>
+
+
+</head>
+
+<body class="bg-gray-200">
+  <header class="bg-white sticky top-0">
+    <nav class="flex justify-between items-center py-2 px-4 space-x-8">
+      <div class="flex">
+        <a href="{% url 'accounts:home' %}">
+        <img class="mx-auto h-12 w-auto" src="{% static 'icons/sunrays.png' %}" alt="icons" />
+        </a>
+
+      </div>
+      <div class="flex border-2 rounded-lg justify-center items-center h-fit bg-gray-200 px-4 w-1/2">
+        <!-- Search Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+
+        <input type="search" name="" id=""
+          class="w-full bg-transparent py-1 px-5 border-2 border-none focus:ring-0 focus:outline-none"
+          placeholder="Search For Beam Groups" />
+      </div>
+      <div class="flex space-x-2 items-center">
+        {% if not user.is_authenticated %}
+        <a href="{% url 'accounts:sign_in'%}">
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0">
+            Sign In
+          </button></a>
+        {% else %}
+        <div class="relative">
+
+          {% if not user.is_authenticated %}
+
+          <img class="w-10 h-10 rounded-full" src="{% static 'icons/bear.png' %}" alt="">
+          <span
+            class="top-0 left-7 absolute  w-3.5 h-3.5 bg-red-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+
+          {% else %}
+          <div class="flex gap-4 ">
+             <a href="{% url 'accounts:sign_out'%}">
+              <button
+                class="bg-blue-500 mt-2 hover:bg-blue-700 text-white text-[12px] font-bold py-1 px-4 rounded-full flex-shrink-0">
+                Logout
+              </button>
+            </a>
+            <div>
+              <a href={% url 'accounts:profile' request.user.id %}>
+                <img class="w-10 h-10 rounded-full" src="{{ user.profile_picture.url }}" alt="">
+                <span
+                  class="top-0 left-7 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif%}
+      </div>
+    </nav>
+  </header>
+  <div class="flex">
+    <aside
+      class="w-1/4 max-w-1/4 bg-white h-[calc(100vh-52px)] flex flex-col text-gray-700 sticky top-[52px] space-y-4">
+      <div class="space-y-4 pb-4 h-full flex-1 overflow-y-scroll no-scrollbar px-2 mt-6">
+        <div class="space-y-2">
+          <p class="text-[10px] capitalize">FEEDS</p>
+          <div class="text-[14px] font-sans text-gray-800 space-y-2">
+            <div>
+              <p><a href="{% url 'accounts:home' %}">HOME</a></p>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <p class="text-[15px] font-bold capitalize">Recent Groups</p>
+          {% comment %} <div class="text-[14px] font-light text-black space-y-2">
+            {% for group in recently_created_groups %}
+            <div>
+              <p>{{forloop.counter}}- b/{{group.name_of_group}}</p>
+            </div>
+            {% endfor %}
+            <div class="mt-6 underline ">
+              <p>Create Community</p>
+            </div>
+          </div> {% endcomment %}
+          <section class="bg-white rounded text-gray-700">
+            <!-- Header Banner -->
+            {% comment %} <p class="text-[15px] font-bold capitalize items-center ">TOP COMMUNITIES</p> {% endcomment %}
+            <div class="p-2 rounded">
+              {% if not user.is_authenticated %}
+              <ul class="space-y-4">
+                {% for group in all_groups %}
+                  <li class="flex justify-between">
+                    {% comment %} <p>{{forloop.counter}}</p> {% endcomment %}
+                    <div class="flex flex-col">
+                    <p class="text-right flex items-right font-bold text-sm">b/{{ group.name_of_group }}</p>
+                    {% if not user.username == group.owner.username %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by {{ group.owner.username }}</p>
+                    {% else %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by you</p>
+                    {% endif %}
+                    </div>
+    
+                    {% if  user.is_authenticated and request.user.id == group.owner.id %}
+                    <button
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:group' request.user.id group.id  %}">
+                    Enter
+                    </button></a>
+
+                    {% elif user.is_authenticated and group.is_closed %}
+                    <button  id="group-action"
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:join_group' request.user.id group.id %}">
+                    Request
+                    </a></button>
+                    <div id="large-modal" tabindex="-1"
+                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
+                    <div class="relative p-4 w-full max-w-4xl h-full md:h-auto">
+                      <!-- Modal content -->
+                      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                        <!-- Modal header -->
+                        <div class="flex justify-between items-center p-5 rounded-t border-b dark:border-gray-600">
+                          <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                            {{ group.name_of_group }}
+                          </h3>
+                          <button type="button" onclick="closeDialog()"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                            data-modal-toggle="large-modal">
+                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                          </button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-6">
+                          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                            {{ group.title}}
+                          </p>
+                          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                           {{ group.description}}
+                          </p>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
+                          <button data-modal-toggle="large-modal" type="button"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Send Request</button>
+                          {% comment %} <button data-modal-toggle="large-modal" type="button"
+                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Decline</button> {% endcomment %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% elif user.is_authenticated  %}
+                      <button
+                      class="bg-blue-500 w-20 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                      >
+                      <a href="{%  url 'groups:join_group' request.user.id group.id %}">
+                      Join</a>
+                      </button>
+                
+                  {% endif %}
+                  </li>
+                  {% endfor %} 
+              </ul>
+              {% else %}
+               <ul class="space-y-4">
+                {% for group in not_user_groups %}
+                  <li class="flex justify-between">
+                    <div class="flex flex-col">
+                    <p class="text-right flex items-right font-bold text-sm">b/{{ group.name_of_group }}</p>
+                    {% if not user.username == group.owner.username %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by {{ group.owner.username }}</p>
+                    {% else %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by you</p>
+                    {% endif %}
+                    </div>
+    
+                    {% if  user.is_authenticated and request.user.id == group.owner.id %}
+                    <button
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:group' request.user.id group.id  %}">
+                    Enter
+                    </button></a>
+
+                    {% elif user.is_authenticated and group.is_closed %}
+                    <button  id="group-action"
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:join_group' request.user.id group.id %}">
+                    Request
+                    </a></button>
+                    <div id="large-modal" tabindex="-1"
+                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
+                    <div class="relative p-4 w-full max-w-4xl h-full md:h-auto">
+                      <!-- Modal content -->
+                      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                        <!-- Modal header -->
+                        <div class="flex justify-between items-center p-5 rounded-t border-b dark:border-gray-600">
+                          <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+                            {{ group.name_of_group }}
+                          </h3>
+                          <button type="button" onclick="closeDialog()"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                            data-modal-toggle="large-modal">
+                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                          </button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="p-6 space-y-6">
+                          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                            {{ group.title}}
+                          </p>
+                          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                           {{ group.description}}
+                          </p>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
+                          <button data-modal-toggle="large-modal" type="button"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Send Request</button>
+                          {% comment %} <button data-modal-toggle="large-modal" type="button"
+                            class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Decline</button> {% endcomment %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% elif user.is_authenticated  %}
+                      <button
+                      class="bg-blue-500 w-20 align-left item-right hover:bg-blue-700 text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                      >
+                      <a href="{%  url 'groups:join_group' request.user.id group.id %}">
+                      Join</a>
+                      </button>
+                
+                  {% endif %}
+                  </li>
+                  {% endfor %} 
+               </ul> 
+              {% endif %}
+            </div>
+            {% if user.is_authenticated %}
+            <p class="text-[15px] font-bold capitalize mt-4">{{ user|title }} Groups</p>
+            <div class="p-2 rounded">
+              <ul class="space-y-4">
+                {% for group in user_group %}
+                  <li class="flex justify-between">
+                    {% comment %} <p>{{forloop.counter}}</p> {% endcomment %}
+                    <div class="flex flex-col">
+                    <p class="text-right flex items-right font-bold text-sm">b/{{ group.name_of_group }}</p>
+                    {% if not user.username == group.owner.username %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by {{ group.owner.username }}</p>
+                    {% else %}
+                    <p class="text-right flex items-right font-base text-xs opacity-50">created by you</p>
+                    {% endif %}
+                    </div>
+    
+            
+                    <button
+                    class="bg-blue-500 w-20 hover:bg-blue-700 align-left
+                    item-right text-white text-[14px] font-bold py-1 px-4 rounded-full"
+                    >
+                    <a href="{%  url 'groups:group' request.user.id group.id  %}">
+                    Enter
+                    </button></a>
+                  </li>
+                  {% endfor %} 
+              </ul>
+            </div>
+            {% endif %}
+          </section>
+        </div>
+
+      </div>
+
+      <div class="text-base font-light text-gray-700 space-y-2 justify-self-end self-end px-2 pb-4">
+        <p class="text-[10px] capitalize">JOIN For Beam Groups</p>
+        <div class="space-y-2">
+          <p>
+            Create an account to follow your favorite communities and start
+            taking part in conversations.
+          </p>
+          {% if user.is_authenticated %}
+
+          <button  type="button" data-modal-toggle="large-modal"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+             <a href={% url 'groups:create-group' request.user.id %}>
+              Create Group
+              </a>
+          </button>
+          {% else %}
+          <a href="{% url 'accounts:sign_up' %}">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+              Join Beam
+            </button>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
+    <article class=" bg-transparent w-full flex px-8 py-4 space-x-8 ">
+      <div class="flex flex-col bg-white w-full  ">
+        {% include 'messages.html'%}
+        {% block content %}
+
+        {% endblock %}
+      </div>
+    </article>
+
+  </div>
+  </div>
+ 
+  <script src="{% static 'scripts/app.js' %}"></script>
+
+</body>
+
+</html>
