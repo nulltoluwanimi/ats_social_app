@@ -81,8 +81,12 @@ WSGI_APPLICATION = 'ats_social_app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dekau70phfhuuv',
+        'USER': 'bsimqcibrzhwbx',
+        'PASSWORD': 'e7c70e2df3a4b8b02c87b8e2cba02e97d4acecbb8806ee10556f20002036cbf1',
+        'HOST': 'ec2-18-208-55-135.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
