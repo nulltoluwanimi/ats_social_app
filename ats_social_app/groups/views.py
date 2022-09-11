@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import User
 from .models import Comments, Group, Posts, Members, Likes, Replies, GroupRequest
 from .forms import GroupCreateForm, PostForm, ReplyForm
-from activities.models import Notification, Event, Poll
+from activities.models import Notification, Event, Poll, EventInvite
 
 
 # from activities.forms import EventCreateForm, PollForms
@@ -54,12 +54,13 @@ def group_details(request, pk, id):
     list_of_members = Members.active_objects.filter(group_id=id)
     suspended_members = Members.suspended_objects.filter(group_id=id)
     group_admin = Members.objects.filter(is_admin=True)
+    event_invite = EventInvite.active_objects.filter(member_id=check_member.id)
 
     context = {
         "group": group,
         "posts": posts,
-
-        "events": group_events,
+        "events": event_invite,
+        "group_events": group_events,
         "group_polls": group_polls,
         "members": list_of_members,
         "notifications": notifications,
