@@ -303,41 +303,42 @@
       </ul>
 
 
+      {% if check_member.is_admin %}
+        <h3 class="text-2xl font-bold p-4">Suspended Members</h3>
+        <ul role="list" class="divide-y divide-gray-200">
+          {% for member in suspended_members %}
+          <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+            <div class="flex justify-between space-x-3">
+              <div class="min-w-0 flex-1">
+  <!--              <a href="#" class="block focus:outline-none">-->
 
-      <h3 class="text-2xl font-bold p-4">Suspended Members</h3>
-      <ul role="list" class="divide-y divide-gray-200">
-        {% for member in suspended_members %}
-        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-          <div class="flex justify-between space-x-3">
-            <div class="min-w-0 flex-1">
-<!--              <a href="#" class="block focus:outline-none">-->
+                  <p class="text-sm font-medium text-gray-900 truncate">{{member.member.full_name}}</p>
+                  <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
+  <!--              </a>-->
+              </div>
+              {% if check_member.is_admin %}
+              <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
+                <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Remove</button>
+              </a>
 
-                <p class="text-sm font-medium text-gray-900 truncate">{{member.member.full_name}}</p>
-                <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
-<!--              </a>-->
+              <a href="{% url 'groups:unsuspend_member' request.user.id group.id member.member.id  %}">
+                <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Unsuspend</button>
+              </a>
+              {% endif %}
             </div>
-            {% if check_member.is_admin %}
-            <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
-              <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Remove</button>
-            </a>
+            <div class="mt-1">
 
-            <a href="{% url 'groups:unsuspend_member' request.user.id group.id member.member.id  %}">
-              <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Unsuspend</button>
-            </a>
-            {% endif %}
-          </div>
-          <div class="mt-1">
-
-            <br>
-            {% if member.is_admin %}
-            <p class="line-clamp-2 text-sm text-gray-600">Admin</p>
-            {% endif %}
-          </div>
-        </li>
-        {% empty %}
-        <p>No suspended members Yet, You can do Better !</p>
-        {% endfor %}
-      </ul>
+              <br>
+              {% if member.is_admin %}
+              <p class="line-clamp-2 text-sm text-gray-600">Admin</p>
+              {% endif %}
+            </div>
+          </li>
+          {% empty %}
+          <p>No suspended members Yet, You can do Better !</p>
+          {% endfor %}
+        </ul>
+      {% endif %}
 
 
 

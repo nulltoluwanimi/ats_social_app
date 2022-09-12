@@ -10,6 +10,14 @@
     <p>{{search_group.description | truncatechars:40}}</p>
     <p>created {{ search_group.date_created | timesince}} ago</p>
 
+    {% if search.group.is_closed %}
+    <p>Closed</p>
+    <a href="{% url 'groups:join_group' request.user.id search_group.id %}"><p>Request</p></a>
+    {% else %}
+    <p>open</p>
+    <a href="{% url 'groups:join_group' request.user.id search_group.id %}"><p>Join</p></a>
+    {% endif %}
+
     <br>
 {% empty %}
 <p>No lists Available</p>
