@@ -8,7 +8,6 @@ def context(request):
     try:
         context['recently_created_groups'] = Group.objects.all().order_by(
             '-date_created')[:5]
-
         context['open_events'] = Event.objects.filter(
             group__is_closed=False)[:4]
         context['open_posts'] = Posts.objects.filter(
