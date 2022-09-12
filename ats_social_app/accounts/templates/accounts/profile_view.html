@@ -70,8 +70,8 @@
              <h5>{{ requests.count }}</h5>
              {% for g_request in requests %}
              <p>{{g_request.request_message}}</p>
-             <a href="{% url 'groups:accept_closed_group' request.user.id g_request.group.id %}"><button type="submit">Accept</button></a>
-             <a href="{% url 'groups:reject_closed_group' request.user.id g_request.group.id %}"><button type="submit">Reject</button></a>
+             <a href="{% url 'groups:accept_closed_group' request.user.id g_request.id %}"><button type="submit">Accept</button></a>
+             <a href="{% url 'groups:reject_closed_group' request.user.id g_request.id %}"><button type="submit">Reject</button></a>
              {% empty %}
              <p>No Group Request Yet</p>
              {% endfor %}

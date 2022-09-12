@@ -100,7 +100,7 @@ def accept_invite(request, pk, id, _id, __id):
     if request.user in event.yes:
         messages.error(request, "You have already accepted the invite")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    event.yes.add(User.objects.get(id=pk))
+    event.yes.append(pk)
     event.save()
     event_invite = EventInvite.active_objects.get(id=__id)
     event_invite.is_active = False
@@ -115,7 +115,7 @@ def reject_invite(request, pk, id, _id, __id):
     if request.user.username in event.no:
         messages.error(request, "You have already rejected the invite")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    event.no.add(User.objects.get(id=pk))
+    event.no.append(pk)
     event.save()
     event_invite = EventInvite.active_objects.get(id=__id)
     event_invite.is_active = False
@@ -130,7 +130,7 @@ def inconclusive_decision_invite(request, pk, id, _id, __id):
     if request.user.username in event.maybe:
         messages.error(request, "You have already selected maybe")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    event.maybe.append(User.objects.get(id=pk))
+    event.maybe.append(pk)
     event.save()
     event_invite = EventInvite.active_objects.get(id=__id)
     event_invite.is_active = False

@@ -22,13 +22,13 @@ class InactiveManager(models.Manager):
 class SuspendedMember(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_suspended=True)
+        return super().get_queryset().filter(is_suspended=True, is_active=True)
 
 
 class NotSuspendedMember(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_suspended=False)
+        return super().get_queryset().filter(is_suspended=False, is_active=True)
 
 
 class Group(models.Model):

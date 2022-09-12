@@ -4,7 +4,10 @@
   <div class="mx-auto p-4 w-full flex flex-col">
 <div class="flex flex-col">
   <h3 class="text-xs text-gray-500">{{members.count}} members available </h3>
-    <h2 class = "font-bold text-xl">{{group.name_of_group}}</h2>
+     <span  class="flex gap-2 ">
+  <h2 class = "font-bold text-xl">{{group.name_of_group}}</h2>
+     <a href="{% url 'groups:exit_group' request.user.id group.id %}" title="Exit Group" class="pt-1"><i class="fa fa-sign-out"></i></a>
+   </span>
     <p>{{group.title}}</p>
   <small claas="opacity-50 text-gray-300 text-xs"> by {{group.owner}}</small>
 </div>
@@ -34,6 +37,7 @@
           {% endif %}
       </div>
       <div class="space-y-4 mt-4">
+
         {% for post in posts %}
           <div class="bg-gray-100 p-2">
             <div class="flex justify-between space-x-2">
@@ -46,7 +50,9 @@
             <h2 class = "font-semibold text-base">{{post.title}}</h2>
             <h3 class="p-2">{{ post.body|safe }}</h3>
             <div class="flex items-center justify-end gap-4">
-              <a href="{% url 'groups:like_post' request.user.id group.id post.id   %}"><i class="fa fa-heart-o"></i></a>
+
+                <a href="{% url 'groups:like_post' request.user.id group.id post.id    %}"><i class="fa fa-heart " ></i></a>
+<!--              <small>{{post.likes_set.all.count}} likes</small>-->
               {% if request.user in group_admin %}
               <i class="fa fa-eye-slash"></i>
               {% endif %}
@@ -74,7 +80,7 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
               <a href="#" class="block focus:outline-none">
-                <span class="absolute inset-0" aria-hidden="true"></span>
+
                 <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
                 <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
               </a>
@@ -105,11 +111,10 @@
         <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
-              <a href="#" class="block focus:outline-none">
-                <span class="absolute inset-0" aria-hidden="true"></span>
+              <span class="block focus:outline-none">
                 <p class="text-sm font-medium text-gray-900 truncate">{{event.event.creator}}</p>
                 <p class="text-sm text-gray-500 truncate">{{event.event.title}}</p>
-              </a>
+              </span>
             </div>
             <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">{{event.event.date_created | timesince}} ago</time>
           </div>
@@ -158,7 +163,7 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
               <a href="#" class="block focus:outline-none">
-                <span class="absolute inset-0" aria-hidden="true"></span>
+
                 <p class="text-sm font-medium text-gray-900 truncate">{{event.creator}}</p>
                 <p class="text-sm text-gray-500 truncate">{{event.title}}</p>
               </a>
@@ -241,12 +246,12 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
 <!--              <a href="#" class="block focus:outline-none">-->
-                <span class="absolute inset-0" aria-hidden="true"></span>
+
                 <p class="text-sm font-medium text-gray-900 truncate">{{member.member.full_name}}</p>
                 <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
 <!--              </a>-->
             </div>
-              {% if member.member.id != group.owner.id %}
+              {% if member.member.id != group.owner.id and request.user.id != member.member.id%}
                   {% if check_member.is_admin  %}
                       <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
                     <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
@@ -262,7 +267,7 @@
                             </button>
 
 
-                          {% if not member.is_admin %}
+                          {% if not member.is_admin and check_member.is_admin %}
                             <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
                              <a href="{% url 'groups:make_admin' request.user.id group.id member.id %}">
                            Make Admin
@@ -284,7 +289,7 @@
             {% if member.is_admin %}
             <p class="line-clamp-2 text-sm text-gray-600">Admin</p>
               {% if request.user.id == group.owner.id and request.user.id != member.member.id %}
-                <a href="{% url 'groups:remove_as_admin' request.user.id group.id member.id %}">
+                <a href="{% url 'groups:remove_as_admin' request.user.id group.id member.member.id %}">
                   <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Remove Admin</button>
                 </a>
               {% endif %}
@@ -306,7 +311,7 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
 <!--              <a href="#" class="block focus:outline-none">-->
-                <span class="absolute inset-0" aria-hidden="true"></span>
+
                 <p class="text-sm font-medium text-gray-900 truncate">{{member.member.full_name}}</p>
                 <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
 <!--              </a>-->

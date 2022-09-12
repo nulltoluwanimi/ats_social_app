@@ -51,11 +51,16 @@ def group_details(request, pk, id):
     posts = Posts.objects.filter(group=group)
     group_events = Event.objects.filter(group_id=id)
     group_polls = Poll.objects.filter(group_id=id)
-    list_of_members = Members.active_objects.filter(group_id=id)
+    list_of_members = Members.not_suspended_objects.filter(group_id=id)
     suspended_members = Members.suspended_objects.filter(group_id=id)
     group_admin = Members.objects.filter(is_admin=True)
-    event_invite = EventInvite.active_objects.filter(member_id=check_member.id)
+    try:
+        event_invite = EventInvite.active_objects.filter(member_id=check_member.id)
+    except:
+        event_invite = []
 
+    print(check_member)
+    print(check_member.likes_set.all())
     context = {
         "group": group,
         "posts": posts,
@@ -67,6 +72,8 @@ def group_details(request, pk, id):
         "check_member": check_member,
         "suspended_members": suspended_members,
         "group_admin": group_admin,
+        # "likes": list(check_member.likes_set.filter(is_active=True)),
+
     }
 
     return render(request, "groups/group_edit.html", context)
@@ -116,18 +123,18 @@ def create_group(request, pk):
 
 @login_required(login_url="accounts:sign_in")
 def make_admin(request, pk, id, _id):
-    member = Members.objects.get(user_id=pk, group_id=id)
+    check_member = Members.objects.get(member_id=pk, group_id=id)
 
-    if member.is_admin:
+    if check_member.is_admin:
         pass
     else:
         return HttpResponseForbidden()
 
-    group = Group.objects.get(id=pk)
+    group = Group.objects.get(id=id)
 
     if len(group.members_set.all().filter(is_admin=True)) <= 3:
         member = Members.objects.get(
-            Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
+            Q(member_id=_id) & Q(group_id=id))
         member.is_admin = True
         member.save()
 
@@ -139,7 +146,7 @@ def make_admin(request, pk, id, _id):
         )
 
         notification.save()
-
+        messages.success(request, f"{member.member.username} made admin successfully")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.error(request, "Admin can not be more than 3")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -147,17 +154,17 @@ def make_admin(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def remove_as_admin(request, pk, id, _id):
-    group = Group.objects.get(id=pk)
-    member = Members.objects.get(user_id=pk, group_id=id)
+    group = Group.objects.get(id=id)
+    check_member = Members.objects.get(member_id=pk, group_id=id)
 
-    if member.is_admin:
+    if check_member.is_admin:
         pass
     else:
         return HttpResponseForbidden()
 
     if len(group.members_set.all().filter(is_admin=True)) > 1:
         member = Members.objects.get(
-            Q(user_id=User.objects.get(id=id).id) & Q(group=group))
+            Q(member_id=_id) & Q(group_id=id))
         member.is_admin = False
         member.save()
 
@@ -177,15 +184,15 @@ def remove_as_admin(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def remove_member_of_group(request, pk, id, _id):
-    group = Group.objects.get(id=pk)
-    member = Members.objects.get(user_id=pk, group_id=id)
+    group = Group.objects.get(id=id)
+    member = Members.objects.get(member_id=pk, group_id=id)
 
     if member.is_admin:
         pass
     else:
         return HttpResponseForbidden()
     member = Members.objects.get(
-        Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
+        Q(member_id=_id) & Q(group_id=id))
     member.is_active = False
     member.save()
 
@@ -204,8 +211,8 @@ def remove_member_of_group(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def suspend_member(request, pk, id, _id):
-    group = Group.objects.get(id=pk)
-    member = Members.objects.get(user_id=pk, group_id=id)
+    group = Group.objects.get(id=id)
+    member = Members.objects.get(member_id=pk, group_id=id)
 
     if member.is_admin:
         pass
@@ -213,7 +220,7 @@ def suspend_member(request, pk, id, _id):
         return HttpResponseForbidden()
 
     member = Members.objects.get(
-        Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
+        Q(member_id=_id) & Q(group=group))
     member.is_suspended = True
     member.save()
 
@@ -232,8 +239,8 @@ def suspend_member(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def unsuspend_member(request, pk, id, _id):
-    group = Group.objects.get(id=pk)
-    member = Members.objects.get(user_id=pk, group_id=id)
+    group = Group.objects.get(id=id)
+    member = Members.objects.get(member_id=pk, group_id=id)
 
     if member.is_admin:
         pass
@@ -241,7 +248,7 @@ def unsuspend_member(request, pk, id, _id):
         return HttpResponseForbidden()
 
     member = Members.objects.get(
-        Q(user_id=User.objects.get(id=_id).id) & Q(group=group))
+        Q(member_id=_id) & Q(group_id=id))
     member.is_suspended = False
     member.save()
 
@@ -269,10 +276,13 @@ def join_group(request, pk, id):
                 messages.info(request, f"You are already a member of {group.name_of_group}")
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
-        # checker_2 = GroupRequest.active_objects.get(user_id=pk, group_id=group.id).first()
-        # if checker_2 is not None:
-        #     messages.error(request, "A group request has been sent to the owner of the group")
-        #     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+        try:
+            checker_2 = GroupRequest.active_objects.filter(user_id=pk, group_id=group.id).first()
+            if checker_2 is not None:
+                messages.error(request, "A group request has been sent to the owner of the group")
+                return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+        except:
+            pass
 
         group_request = GroupRequest.objects.create(
             user=User.objects.get(id=pk),
@@ -285,7 +295,7 @@ def join_group(request, pk, id):
             content=f"{new_member.username} wants to join {group.title}",
         )
 
-        for members in group.member_set.filter(is_admin=True):
+        for members in group.members_set.filter(is_admin=True):
             notification.user.add(members.member)
 
         notification.save()
@@ -295,7 +305,7 @@ def join_group(request, pk, id):
 
     else:
 
-        for member in group.members_set.all():
+        for member in group.members_set.filter(is_active=True):
             if member.member_id == pk:
                 messages.info(request, f"You are already a member of {group.name_of_group}")
                 return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
@@ -336,7 +346,7 @@ def accept_request_closed_group(request, pk, id):
     notification.user.add(User.objects.get(id=specific_request.user_id))
     notification.save()
 
-    return HttpResponseRedirect(reverse(request.META.get("HTTP_REFERER")))
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 def reject_request_closed_group(request, pk, id):
@@ -358,15 +368,13 @@ def reject_request_closed_group(request, pk, id):
 
 
 def exit_group(request, pk, id):
-    member = Members.active_objects.get(user_id=pk, group_id=id)
+    member = Members.active_objects.get(member_id=pk, group_id=id)
     member.is_active = False
     member.save()
 
-    group = Group.active_objects.get(id=id)
-
     notification = Notification.objects.create(
-        group=group,
-        content=f"{member.user.username} left the {group}",
+        group_id=member.group_id,
+        content=f"{member.member.username} left the {member.group}",
     )
 
     notification.save()
@@ -406,7 +414,7 @@ def list_of_groups(request):
 
 @login_required(login_url="accounts:sign_in")
 def like_post(request, pk, id, _id):
-    post_like = Likes.objects.get_or_create(member_id=pk, post_id=_id)[0]
+    post_like = Likes.objects.get_or_create(member__member_id=pk, post_id=_id)[0]
     print(post_like)
 
     post_like.is_active = not post_like.is_active
@@ -429,7 +437,7 @@ def like_post(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def like_comment(request, pk, id, _id):
-    comment_like = Likes.objects.get_or_create(member_id=pk, comment_id=_id)[0]
+    comment_like = Likes.objects.get_or_create(member__member_id=pk, comment_id=_id)[0]
 
     comment_like.is_active = not comment_like.is_active
     comment_like.save()
@@ -451,7 +459,7 @@ def like_comment(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def like_reply(request, pk, id, _id):
-    reply_like = Likes.objects.get_or_create(member_id=pk, reply_id=_id)[0]
+    reply_like = Likes.objects.get_or_create(member__member_id=pk, reply_id=_id)[0]
 
     reply_like.is_active = not reply_like.is_active
     reply_like.save()
@@ -475,7 +483,7 @@ def like_reply(request, pk, id, _id):
 def create_post(request, pk, id):
     form = PostForm()
 
-    user = Members.objects.get(pk=pk)
+    user = Members.objects.filter(member_id=pk, group_id=id).first()
     if user.is_suspended:
         messages.error(request, "You can't perform that action, please message admin")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -484,13 +492,13 @@ def create_post(request, pk, id):
         form = PostForm(request.POST)
 
         if form.is_valid():
-            new_post = Posts(member=Members.active_objects.get(id=pk),
+
+            new_post = Posts(member=Members.active_objects.get(member_id=pk, group_id=id),
                              group=Group.active_objects.get(id=id),
                              title=form.cleaned_data['title'],
                              body=form.cleaned_data['body'],
                              )
             new_post.save()
-
             notification = Notification.objects.create(
                 group=new_post.group,
                 content=f"{user.member.username} created a post group",
@@ -512,7 +520,7 @@ def create_post(request, pk, id):
 
 @login_required(login_url="accounts:sign_in")
 def hide_post(request, pk, id, _id):
-    member = Members.active_objects.get(user_id=pk, group_id=id)
+    member = Members.active_objects.get(member__member_id=pk, group_id=id)
 
     if member.is_admin:
         post = Posts.active_objects.get(id=_id)
@@ -525,7 +533,7 @@ def hide_post(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def hide_comment(request, pk, id, _id):
-    member = Members.active_objects.get(user_id=pk, group_id=id)
+    member = Members.active_objects.get(member__member_id=pk, group_id=id)
 
     if member.is_admin:
         comment = Comments.active_objects.get(id=_id)
@@ -538,7 +546,7 @@ def hide_comment(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def hide_reply(request, pk, id, _id):
-    member = Members.active_objects.get(user_id=pk, group_id=id)
+    member = Members.active_objects.get(member__member_id=pk, group_id=id)
 
     if member.is_admin:
         reply = Replies.active_objects.get(id=_id)
