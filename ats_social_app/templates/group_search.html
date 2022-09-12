@@ -1,4 +1,18 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
+
+{% for search_group in list_of_groups %}
+
+    <p>{{search_group.name_of_group}}</p>
+    <p>{{search_group.creator}}</p>
+    <p>{{search_group.title}}</p>
+    <p>{{search_group.description | truncatechars:40}}</p>
+    <p>created {{ search_group.date_created | timesince}} ago</p>
+
+    <br>
+{% empty %}
+<p>No lists Available</p>
+{% endfor %}
+
 {% endblock %}

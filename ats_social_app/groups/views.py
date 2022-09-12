@@ -17,17 +17,21 @@ from activities.models import Notification, Event, Poll, EventInvite
 # Create your views here.
 
 
-# def home(request):
-#     # search = request.GET.get("search") if request.GET.get(
-#     #     "search") is not None else ""
+def group_search(request):
+    search = request.POST.get("search") if request.POST.get(
+        "search") is not None else ""
 
-#     # list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
-#     #                                              | Q(owner__full_name__icontains=search))
+    list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
+                                                 | Q(owner__full_name__icontains=search)
+                                                 | Q(name_of_group__icontains=search)
+                                                 )
 
-#     # context = {
-#     #     "list_of_groups": list_of_groups
-#     # }
-#     return render(request, "home.html")
+    print(list_of_groups)
+
+    context = {
+        "list_of_groups": list_of_groups
+    }
+    return render(request, "group_search.html", context)
 
 
 # def group_test(request):
