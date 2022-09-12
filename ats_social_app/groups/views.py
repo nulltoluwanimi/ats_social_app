@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 from accounts.models import User
 from .models import Comments, Group, Posts, Members, Likes, Replies, GroupRequest
-from .forms import GroupCreateForm, PostForm, ReplyForm
+from .forms import GroupCreateForm, PostForm, ReplyForm, CommentForm
 from activities.models import Notification, Event, Poll
 
 
@@ -46,7 +46,8 @@ from activities.models import Notification, Event, Poll
 @login_required(login_url="accounts:sign_in")
 def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
-    check_member = Members.not_suspended_objects.filter(member_id=pk, group_id=id).first()
+    check_member = Members.not_suspended_objects.filter(
+        member_id=pk, group_id=id).first()
     notifications = Notification.objects.filter(group_id=id)
     posts = Posts.objects.filter(group=group)
     group_events = Event.objects.filter(group_id=id)
@@ -168,7 +169,8 @@ def remove_as_admin(request, pk, id, _id):
         )
         notification.save()
 
-        messages.success(request, f"{member.member.username} removed as admin successfully")
+        messages.success(
+            request, f"{member.member.username} removed as admin successfully")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.error(request, "Admin can not be less than 1")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -197,7 +199,8 @@ def remove_member_of_group(request, pk, id, _id):
 
     notification.save()
 
-    messages.success(request, f"{member.member.username} removed from {group} successfully")
+    messages.success(
+        request, f"{member.member.username} removed from {group} successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -225,7 +228,8 @@ def suspend_member(request, pk, id, _id):
     notification.user.add(member.member)
 
     notification.save()
-    messages.success(request, f"{member.member.username} suspended successfully")
+    messages.success(
+        request, f"{member.member.username} suspended successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -253,7 +257,8 @@ def unsuspend_member(request, pk, id, _id):
     notification.user.add(member.member)
 
     notification.save()
-    messages.success(request, f"{member.member.username} suspension lifted successfully")
+    messages.success(
+        request, f"{member.member.username} suspension lifted successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -265,7 +270,8 @@ def join_group(request, pk, id):
     if group.is_closed:
         for member in group.members_set.all():
             if member.member_id == pk:
-                messages.info(request, f"You are already a member of {group.name_of_group}")
+                messages.info(
+                    request, f"You are already a member of {group.name_of_group}")
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
         # checker_2 = GroupRequest.active_objects.get(user_id=pk, group_id=group.id).first()
@@ -289,14 +295,16 @@ def join_group(request, pk, id):
 
         notification.save()
 
-        messages.success(request, "A request has been sent to the Admin of the group")
+        messages.success(
+            request, "A request has been sent to the Admin of the group")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
     else:
 
         for member in group.members_set.all():
             if member.member_id == pk:
-                messages.info(request, f"You are already a member of {group.name_of_group}")
+                messages.info(
+                    request, f"You are already a member of {group.name_of_group}")
                 return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
 
         member = Members.objects.create(
@@ -304,7 +312,8 @@ def join_group(request, pk, id):
             group=group
         )
         member.save()
-        messages.success(request, f"you have joined '{group.name_of_group}' successfully")
+        messages.success(
+            request, f"you have joined '{group.name_of_group}' successfully")
         notification = Notification.objects.create(
             group=group,
             title="New Member",
@@ -382,10 +391,56 @@ def create_reply(request, pk, id, _id):
         if form.is_valid():
             new_reply = form.save(commit=False)
             new_reply.user = User.objects.get(id=pk)
+            new_reply.coment = Comments.active_objects.get(id=_id)
+            new_reply.save()
+
+            return
+
+
+@login_required(login_url="accounts:sign_in")
+def create_comment(request, pk, id):
+    form = CommentForm()
+    print(1, request.POST)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            new_reply = form.save(commit=False)
+            new_reply.member = User.objects.get(id=pk)
+            new_reply.post = Posts.objects.get(id=id)
+            new_reply.save()
+
+            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+
+@login_required(login_url="accounts:sign_in")
+def create_reply(request, pk, id, _id):
+    form = ReplyForm()
+
+    if request.method == "POST":
+        form = ReplyForm(request.POST)
+
+        if form.is_valid():
+            new_reply = form.save(commit=False)
+            new_reply.user = User.objects.get(id=pk)
             new_reply.comment = Comments.active_objects.get(id=_id)
             new_reply.save()
 
             return
+
+
+def post_detail(request, pk):
+    post = Posts.objects.get(id=pk)
+    comments = Comments.objects.filter(post_id=pk)
+    context = {
+        "post": post,
+        # 'photo':request.user.profile_picture.url
+        "comments": comments
+
+
+    }
+    return render(request, 'groups/post_detail.html', context)
 
 
 def list_of_groups(request):
@@ -395,7 +450,7 @@ def list_of_groups(request):
     list_of_groups = Group.active_objects.filter(Q(title__icontains=search) | Q(description__icontains=search)
                                                  | Q(owner_first_name__icontains=search) | Q(
         owner_last_name__icontains=search)
-                                                 )
+    )
 
     context = {
         "form": list_of_groups
@@ -422,7 +477,8 @@ def like_post(request, pk, id, _id):
         notification.save()
         messages.success(request, f"{post_like.post.title} liked successfully")
     else:
-        messages.success(request, f"{post_like.post.title} unliked successfully")
+        messages.success(
+            request, f"{post_like.post.title} unliked successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -440,7 +496,8 @@ def like_comment(request, pk, id, _id):
             content=f"{comment_like.member.member.username} liked a comment in '{comment_like.comment}'",
         )
 
-        notification.user.add(User.objects.get(id=comment_like.member.member.id))
+        notification.user.add(User.objects.get(
+            id=comment_like.member.member.id))
         notification.save()
         messages.success(request, f"comment liked successfully")
     else:
@@ -464,9 +521,11 @@ def like_reply(request, pk, id, _id):
 
         notification.user.add(User.objects.get(id=reply_like.member.member.id))
         notification.save()
-        messages.success(request, f"{reply_like.post.title} liked successfully")
+        messages.success(
+            request, f"{reply_like.post.title} liked successfully")
     else:
-        messages.success(request, f"{reply_like.post.title} unliked successfully")
+        messages.success(
+            request, f"{reply_like.post.title} unliked successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -474,16 +533,17 @@ def like_reply(request, pk, id, _id):
 def create_post(request, pk, id):
     form = PostForm()
 
-    user = Members.objects.get(pk=pk)
+    user = Members.objects.get(member_id=pk)
     if user.is_suspended:
-        messages.error(request, "You can't perform that action, please message admin")
+        messages.error(
+            request, "You can't perform that action, please message admin")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     if request.method == "POST":
         form = PostForm(request.POST)
 
         if form.is_valid():
-            new_post = Posts(member=Members.active_objects.get(id=pk),
+            new_post = Posts(member=Members.active_objects.get(member_id=pk),
                              group=Group.active_objects.get(id=id),
                              title=form.cleaned_data['title'],
                              body=form.cleaned_data['body'],

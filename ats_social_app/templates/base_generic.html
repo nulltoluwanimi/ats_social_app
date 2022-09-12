@@ -109,11 +109,13 @@
               </button>
             </a>
             <div>
+              <div>
               <a href={% url 'accounts:profile' request.user.id %}>
                 <img class="w-10 h-10 rounded-full" src="{{ user.profile_picture.url }}" alt="">
                 <span
                   class="top-0 left-7 absolute  w-3.5 h-3.5 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
               </a>
+              </div>
             </div>
           </div>
           {% endif %}
@@ -317,6 +319,8 @@
                 
                   {% endif %}
                   </li>
+                  {% empty %}
+                  <p class="text-[15px]  capitalize mt-4">Join a group to get started</p>
                   {% endfor %} 
                </ul> 
               {% endif %}
@@ -346,6 +350,8 @@
                     Enter
                     </button></a>
                   </li>
+                  {%empty%}
+                  <p class="text-[15px]  capitalize mt-4">Join a group to get started</p>
                   {% endfor %} 
               </ul>
             </div>

@@ -1,0 +1,212 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block content %}
+<div class="flex w-full">
+    <div class="relative py-16 bg-white overflow-hidden w-1/2  mx-auto">
+        <div class="hidden lg:block lg:absolute lg:inset-y-0">
+            <div class="relative h-full text-lg max-w-prose mx-auto" aria-hidden="true">
+                <svg class="absolute top-12 left-full transform translate-x-32" width="404" height="384" fill="none"
+                    viewBox="0 0 404 384">
+                    <defs>
+                        <pattern id="74b3fd99-0a6f-4271-bef2-e80eeafdf357" x="0" y="0" width="20" height="20"
+                            patternUnits="userSpaceOnUse">
+                            <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                        </pattern>
+                    </defs>
+                    <rect width="404" height="384" fill="url(#74b3fd99-0a6f-4271-bef2-e80eeafdf357)" />
+                </svg>
+                <svg class="absolute top-1/2 right-full transform -translate-y-1/2 -translate-x-32" width="404"
+                    height="384" fill="none" viewBox="0 0 404 384">
+                    <defs>
+                        <pattern id="f210dbf6-a58d-4871-961e-36d5016a0f49" x="0" y="0" width="20" height="20"
+                            patternUnits="userSpaceOnUse">
+                            <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                        </pattern>
+                    </defs>
+                    <rect width="404" height="384" fill="url(#f210dbf6-a58d-4871-961e-36d5016a0f49)" />
+                </svg>
+                <svg class="absolute bottom-12 left-full transform translate-x-32" width="404" height="384" fill="none"
+                    viewBox="0 0 404 384">
+                    <defs>
+                        <pattern id="d3eb07ae-5182-43e6-857d-35c643af9034" x="0" y="0" width="20" height="20"
+                            patternUnits="userSpaceOnUse">
+                            <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
+                        </pattern>
+                    </defs>
+                    <rect width="404" height="384" fill="url(#d3eb07ae-5182-43e6-857d-35c643af9034)" />
+                </svg>
+            </div>
+        </div>
+        <div class="relative px-4 sm:px-6 lg:px-8">
+            <div class="text-lg max-w-prose mx-auto">
+                <div class="block mb-6 text-base text-center text-indigo-600 font-semibold tracking-wide">
+                
+                    <a href="#" class="inline-block"><span
+                            class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-pink-100 text-pink-800">
+                            {{tag.caption}}</span></a>
+
+
+                </div>
+                <h1>
+                    <div class="flex text-gray-500 text-base items-center">
+                        <small>b/{{ post.group.name_of_group }}</small>
+                        &nbsp;
+                        <small class="font-light">•&nbsp;Posted by u/{{post.member.member}} {{ post.date_created|timesince }} ago</small>
+                      </div>
+                    <span
+                        class="mt-2 block text-xl text-left leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        {{ post.title }}</span>
+                    <!-- <form action="post" action=" ">
+                        {% csrf_token %} -->
+                    <span class="mt-2 block text-xl text-center leading-8 tracking-tight text-gray-900 sm:text-xl">
+                        {% comment %} <a href="{% url 'cape:toggle-like' post.slug %}"> {% if liked_post %}<i class="fa fa-heart"> {% endcomment %}
+                                {% comment %} {% else %}<i class="fa fa-heart-o"> {% endif %}</i> </i></a> <span> {% endcomment %}
+                            {{likes}}</span>
+                        <!-- </span> -->
+                        </form>
+                       
+                </h1 <p class="mt-8 text-xl text-gray-500 leading-8">{{post.body|safe}}</p>
+            </div>
+            
+        </div>
+    </div>
+    <div class="relative py-16 bg-white overflow-hidden w-1/2 mx-auto">
+        <div class="">
+            <div class="relative h-full text-lg max-w-prose mx-auto" aria-hidden="true">
+
+                <div class="relative py-16 bg-white overflow-hidden mx-auto top-0 sticky">
+                    <div class="flex items-start ">
+                        <div class="flex-shrink-0 pr-2">
+                            {% comment %} <img class="inline-block h-10 w-10 rounded-full "
+                                src="{% static 'user.profile_picture.url' %}"
+                                alt=""/> {% endcomment %}
+                        </div>
+                        <div class="flex-1">
+                            <form id="comment_form" class="relative" onsubmit="{% url 'groups:add_comment' request.user.id post.id %}"
+                                method="post">
+                                {% csrf_token %}
+                                <div
+                                    class="border border-gray-300 rounded-lg shadow-sm overflow-hidden ">
+                                    <label for="comment" class="sr-only">Add your comment</label>
+                                    <textarea rows="3" name="content" id="content"
+                                        class="block w-full py-3 border-0 resize-none focus:ring-0 sm:text-sm"
+                                        placeholder="Add your comment..."></textarea>
+
+                                    <!-- Spacer element to match the height of the toolbar -->
+                                    <div class="py-2" aria-hidden="true">
+                                        <!-- Matches height of button in toolbar (1px border + 36px content height) -->
+                                        <div class="py-px">
+                                            <div class="h-9"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex-shrink-0 my-2">
+                                    <button type="submit" value="Submit"
+                                        class="inline-flex flex-end items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 ">Add Comment</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="relative mt-12 ">
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center">
+                                <span class="px-3 bg-white text-lg font-medium text-indigo-900"> Post Comments </span>
+                            </div>
+
+                        </div>
+                        
+                        <ul role="list" class="divide-y divide-gray-200" id="comment_list">
+                            {% for comment in comments %}
+                            <li class="px-4 py-4 sm:px-0">
+
+                                <span class=" bg-white text-sm font-medium text-indigo-900">{{comment.member.member}}</span>
+                                <span class="text-grey-200 text-xs font-medium">
+                                    ({{comment.date_created|timesince}})</span><br>
+                                <span class="text-grey-200  text-base font-medium">{{comment.content}}</span>
+
+                            </li>
+                            {% empty %}
+                            <div> No Comment yet for this post </div>
+                            {% endfor %}
+                        </ul>
+ 
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    console.log('I am in scripts')
+    {% comment %} function formSubmit() {
+        const form = new FormData();
+        const value = document.getElementById('comment').value
+        console.log(value)
+        form.append('text', value)
+        form.append('date', new Date())
+       
+
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        console.log(csrf_token)
+        const url = "{%  url 'cape:add-comment' post.slug %}"
+        fetch(url, {
+            method: 'POST',
+            body: form,
+            headers: {
+                // 'Content-Type': 'application/json',
+                'X-CSRFToken': csrf_token
+            }
+        }).then(async (response) => {
+           // console.log(response.status, response)
+            if (response.status === 200) {
+                //const div = document.createElement('ul')
+                const comment_item = document.createElement('li')
+                comment_item.className = "px-4 py-4 sm:px-0"
+                const span_time = document.createElement('span')
+
+                span_time.className = "text-grey-200 text-xs font-medium"
+                const span_text = document.createElement('span')
+                span_text.className = "text-grey-200  text-base font-medium"
+                const span_user = document.createElement('span')
+                span_user.className = "bg-white text-sm font-medium text-indigo-900"
+
+
+                //console.log(await response.json())
+                const returned_data  = await response.json()
+                console.log(returned_data)
+
+                span_text.innerHTML = returned_data.data.text
+                console.log(returned_data.data.time ,new Date(returned_data.data.time))
+                span_time.innerHTML = returned_data.data.date
+                span_user.innerHTML = "{{user}}"
+
+                const br  = document.createElement('br')
+
+                comment_item.appendChild(span_user)
+                comment_item.appendChild(span_time)
+                comment_item.appendChild(br)
+                comment_item.appendChild(span_text)
+
+                const comment_ul = document.querySelector('#comment_list')
+                //user = document.createTextNode("{{ comment.user}}")
+                //span_user.innerHTML = user
+                //div.appendChild(span_user)
+                comment_ul.prepend(comment_item)
+
+
+            }
+        })
+            .catch(error => console.log(error))
+    } {% endcomment %}
+
+</script>
+
+{% endblock %}

@@ -16,7 +16,8 @@
               <small class="font-light">•&nbsp;Posted by u/user {{ post.date_created|timesince }} ago</small>
             </div>
           </div>
-          <h3>{{ post.body|safe }}</h3>
+          <h2 class="font-semibold text-base">{{ post.title }}</h2>
+          <h3>{{ post.body|striptags|truncatechars:100 }}</h3>
           <div class="flex items-center justify-end gap-4">
             <i class="fa fa-heart-o"></i>
             <i class="fa fa-share-alt"></i>
