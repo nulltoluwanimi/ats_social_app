@@ -52,10 +52,10 @@
             <div class="flex items-center justify-end gap-4">
 
               {% if post.id in likes %}
-              {% else %}
-              {% endif %}
-
                 <a href="{% url 'groups:like_post' request.user.id group.id post.id    %}"><i class="fa fa-heart " ></i></a>
+              {% else %}
+                <a href="{% url 'groups:like_post' request.user.id group.id post.id    %}"><i class="fa fa-heart-o " ></i></a>
+              {% endif %}
 
 
               {% if request.user in group_admin %}

@@ -13,7 +13,7 @@ class EventCreateForm(forms.ModelForm):
 
 
 class PollForms(forms.Form):
-    title = forms.CharField(max_length=90, required=True)
+    title = forms.CharField(max_length=90, required=True, help_text="Enter the Question ?")
     start_date = forms.DateTimeField(required=True)
     stop_date = forms.DateTimeField(required=True)
     poll_option1 = forms.CharField(max_length=50, required=True)

@@ -61,7 +61,7 @@ def group_details(request, pk, id):
         "check_member": check_member,
         "suspended_members": suspended_members,
         "group_admin": group_admin,
-        "likes": (likes.post_id for likes in check_member.likes_set.all()),
+        "likes": [likes.post_id for likes in check_member.likes_set.all() if likes.is_active],
 
     }
 
@@ -418,9 +418,6 @@ def like_post(request, pk, id, _id):
 
         notification.user.add(User.objects.get(id=post_like.member.member.id))
         notification.save()
-        messages.success(request, f"{post_like.post.title} liked successfully")
-    else:
-        messages.success(request, f"{post_like.post.title} unliked successfully")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
