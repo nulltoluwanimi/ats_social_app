@@ -2,7 +2,8 @@ from email.policy import default
 from django.db import models
 
 from accounts.models import User
-from groups.models import Group, SuspendedMember, NotSuspendedMember, Posts, Replies, Likes, Members, InactiveManager, ActiveManager
+from groups.models import Group, SuspendedMember, NotSuspendedMember, Posts, Replies, Likes, Members, InactiveManager, \
+    ActiveManager
 
 
 # Create your models here.
@@ -68,6 +69,15 @@ class Event(models.Model):
     class Meta:
         ordering = ("-date_created",)
 
+    def for_yes(self):
+        return len(self.yes)
+
+    def for_no(self):
+        return len(self.no)
+
+    def for_maybe(self):
+        return len(self.maybe)
+
 
 class EventInvite(models.Model):
     member = models.ForeignKey(Members, on_delete=models.CASCADE)
@@ -79,12 +89,10 @@ class EventInvite(models.Model):
     inactive_objects = InactiveManager()
 
 
-
-
 class Poll(models.Model):
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
-    title = models.CharField(max_length=90, null=True)
+    title = models.CharField(max_length=90, null=True, help_text="Kindly input the question")
     description = models.CharField(max_length=500)
 
     start_date = models.DateTimeField()
@@ -101,4 +109,3 @@ class Poll(models.Model):
     # poll_option_2_count = models.ManyToManyField(User, related_name="poll_2")
     # poll_option_3_count = models.ManyToManyField(User, related_name="poll_3")
     # poll_option_4_count = models.ManyToManyField(User, related_name="poll_4")
-
