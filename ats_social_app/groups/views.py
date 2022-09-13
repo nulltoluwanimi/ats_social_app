@@ -34,19 +34,6 @@ def group_search(request):
     return render(request, "group_search.html", context)
 
 
-# def group_test(request):
-#     context = {
-#         'post_form': PostForm(),
-#         # 'poll_form': PollForms(),
-#         # 'event_form': EventCreateForm()
-#
-#     }
-#     return render(request, "groups/group_edit.html", context)
-
-
-# def group_test(request):
-#     return render(request, "groups/group_timeline.html", )
-
 @login_required(login_url="accounts:sign_in")
 def group_details(request, pk, id):
     group = Group.objects.get(pk=id)
@@ -63,8 +50,6 @@ def group_details(request, pk, id):
     except:
         event_invite = []
 
-    print(check_member)
-    print(check_member.likes_set.all())
     context = {
         "group": group,
         "posts": posts,
@@ -76,7 +61,7 @@ def group_details(request, pk, id):
         "check_member": check_member,
         "suspended_members": suspended_members,
         "group_admin": group_admin,
-        # "likes": list(check_member.likes_set.filter(is_active=True)),
+        "likes": (likes.post_id for likes in check_member.likes_set.all()),
 
     }
 

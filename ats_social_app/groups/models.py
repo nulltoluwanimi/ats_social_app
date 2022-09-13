@@ -180,4 +180,4 @@ class Likes(models.Model):
         verbose_name_plural = 'likes'
 
     def __str__(self):
-        return self.member.member.username
+        return str(self.member)
