@@ -180,11 +180,11 @@ def create_polls(request, pk, id):
                 title=form.cleaned_data.get("title"),
                 start_date=form.cleaned_data.get("start_date"),
                 stop_date=form.cleaned_data.get("stop_date"),
-                # poll_option = poll_option["poll_1"] = [],
-                # poll_option = poll_option["poll_2"] = [],
-                # poll_option = poll_option["poll_3"] = [],
-                # poll_option = poll_option["poll_4"] = [],
             )
+            new_poll.poll_option = new_poll.poll_option[form.cleaned_data.get("poll_option1")] = [],
+            new_poll.poll_option = new_poll.poll_option[form.cleaned_data.get("poll_option2")] = [],
+            new_poll.poll_option = new_poll.poll_option[form.cleaned_data.get("poll_option3")] = [],
+            new_poll.poll_option = new_poll.poll_option[form.cleaned_data.get("poll_option4")] = [],
 
             new_poll.save()
 

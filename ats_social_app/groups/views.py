@@ -403,10 +403,11 @@ def list_of_groups(request):
 
 @login_required(login_url="accounts:sign_in")
 def like_post(request, pk, id, _id):
-    post_like = Likes.objects.get_or_create(member__member_id=pk, post_id=_id)[0]
-    print(post_like)
+    post_like = Likes.objects.get_or_create(member=Members.objects.get(member_id=pk, group_id=id), post_id=_id)[0]
+    # print(post_like)
 
     post_like.is_active = not post_like.is_active
+    print(post_like.member)
     post_like.save()
 
     if post_like.is_active:
@@ -423,7 +424,7 @@ def like_post(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def like_comment(request, pk, id, _id):
-    comment_like = Likes.objects.get_or_create(member__member_id=pk, comment_id=_id)[0]
+    comment_like = Likes.objects.get_or_create(member=Members.objects.get(member_id=pk, group_id=id), comment_id=_id)[0]
 
     comment_like.is_active = not comment_like.is_active
     comment_like.save()
@@ -445,7 +446,7 @@ def like_comment(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def like_reply(request, pk, id, _id):
-    reply_like = Likes.objects.get_or_create(member__member_id=pk, reply_id=_id)[0]
+    reply_like = Likes.objects.get_or_create(member=Members.objects.get(member_id=pk, group_id=id), reply_id=_id)[0]
 
     reply_like.is_active = not reply_like.is_active
     reply_like.save()
