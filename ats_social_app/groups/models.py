@@ -22,13 +22,13 @@ class InactiveManager(models.Manager):
 class SuspendedMember(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_suspended=True)
+        return super().get_queryset().filter(is_suspended=True, is_active=True)
 
 
 class NotSuspendedMember(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_suspended=False)
+        return super().get_queryset().filter(is_suspended=False, is_active=True)
 
 
 class Group(models.Model):
@@ -102,7 +102,8 @@ class Members(models.Model):
 class Posts(models.Model):
     member = models.ForeignKey(Members, on_delete=models.SET_NULL, null=True)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True)
-    title = models.CharField(max_length=50, null=True, blank=True, default=group.name)
+    title = models.CharField(max_length=50, null=True,
+                             blank=True, default=group.name)
     body = CKEditor5Field('body', config_name="extends")
     image = models.ImageField(blank=True, upload_to="post_images", null=True)
     additional_files = models.FileField(
@@ -163,7 +164,8 @@ class Replies(models.Model):
 
 class Likes(models.Model):
     member = models.ForeignKey(Members, on_delete=models.SET_NULL, null=True)
-    post = models.ForeignKey(Posts, on_delete=models.SET_NULL, null=True, blank=True)
+    post = models.ForeignKey(
+        Posts, on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.ForeignKey(
         Comments, blank=True, null=True, on_delete=models.SET_NULL)
     reply = models.ForeignKey(

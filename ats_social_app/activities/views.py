@@ -1,4 +1,5 @@
-from django.shortcuts import render
+
+from django.shortcuts import render, reverse
 from django.contrib import messages
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
 from .forms import EventCreateForm, PollForms
-from .models import Event, Notification, Poll
+from .models import Event, Notification, Poll, EventInvite
 from accounts.models import User
 from groups.models import Group, Members
 
@@ -36,22 +37,29 @@ def create_event(request, pk, id):
                 group=Group.objects.get(id=id),
                 content=form.cleaned_data["title"],
                 is_admin_notification=True
-
             )
-            for members in event.group.members_set.filter(is_admin=True):
-                notification.user.add(members.member)
 
+            for members in event.group.members_set.filter(is_admin=True, is_suspended=False):
+                notification.user.add(members.member)
             notification.save()
 
-            messages.success(request, "Event Created Successfuly")
-            return
+            for all_members in event.group.members_set.filter(is_suspended=False):
+                event_invite = EventInvite.objects.create(
+                    member=all_members,
+                    event=event
+
+                )
+                event_invite.save()
+
+            messages.success(request, "Event Created Successfully")
+            return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
         error = (form.errors.as_text()).split("*")
         messages.error(request, error[len(error) - 1])
 
     context = {
         "form": form
     }
-    return
+    return render(request, "groups/create_event.html", context)
 
 
 @login_required(login_url="accounts:sign_in")
@@ -66,14 +74,14 @@ def edit_event(request, pk, id, _id):
             form.save()
 
             messages.success(request, "Event edited successfully")
-            return
+            return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
         error = (form.errors.as_text()).split("*")
         messages.error(request, error[len(error) - 1])
 
     context = {
         "form": form,
     }
-    return
+    return render(request, "groups/create_event.html", context)
 
 
 class EventList(LoginRequiredMixin, ListView):
@@ -87,35 +95,50 @@ class EventList(LoginRequiredMixin, ListView):
 
 
 @login_required(login_url="accounts:sign_in")
-def accept_invite(request, pk, id, _id):
+def accept_invite(request, pk, id, _id, __id):
     event = Event.running_objects.get(id=_id)
-    if request.user.username in event.yes.all():
+    if request.user in event.yes:
         messages.error(request, "You have already accepted the invite")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    event.yes.add(User.objects.get(id=pk))
+    event.yes.append(pk)
     event.save()
+    event_invite = EventInvite.active_objects.get(id=__id)
+    event_invite.is_active = False
+    event_invite.save()
+    messages.success(request, "Splendid , we will be expecting you")
+
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="accounts:sign_in")
-def reject_invite(request, pk, id, _id):
+def reject_invite(request, pk, id, _id, __id):
     event = Event.running_objects.get(id=_id)
-    if request.user.username in event.no.all():
+    if request.user.username in event.no:
         messages.error(request, "You have already rejected the invite")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    event.no.add(User.objects.get(id=pk))
+    event.no.append(pk)
     event.save()
+    event_invite = EventInvite.active_objects.get(id=__id)
+    event_invite.is_active = False
+    event_invite.save()
+    messages.success(request, "We would have loved to see you but, OH WELL !")
+
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 @login_required(login_url="accounts:sign_in")
-def inconclusive_decision_invite(request, pk, id, _id):
+def inconclusive_decision_invite(request, pk, id, _id, __id):
     event = Event.running_objects.get(id=_id)
-    if request.user.username in event.yes.all():
+    if request.user.username in event.maybe:
         messages.error(request, "You have already selected maybe")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-    event.maybe.append(User.objects.get(id=pk))
+    event.maybe.append(pk)
     event.save()
+    event_invite = EventInvite.active_objects.get(id=__id)
+    event_invite.is_active = False
+    event_invite.save()
+    messages.success(request, "Ooops, oh well !")
+
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
@@ -126,7 +149,8 @@ class AdminEventDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     login_url = "accounts:sign_in"
 
     def test_func(self, **kwargs):
-        admin_status = Members.active_objects.get(user_id=kwargs["pk"], group_id=kwargs["id"])
+        admin_status = Members.active_objects.get(
+            user_id=kwargs["pk"], group_id=kwargs["id"])
         return admin_status.is_admin
 
     def get_queryset(self, **kwargs):
@@ -140,7 +164,8 @@ class AdminAllGroupEvents(LoginRequiredMixin, UserPassesTestMixin, ListView):
     login_url = "accounts:sign_in"
 
     def test_func(self, **kwargs):
-        admin_status = Members.active_objects.get(user_id=kwargs["pk"], group_id=kwargs["id"])
+        admin_status = Members.active_objects.get(
+            user_id=kwargs["pk"], group_id=kwargs["id"])
         return admin_status.is_admin
 
     def get_queryset(self, **kwargs):
@@ -161,25 +186,13 @@ def create_polls(request, pk, id):
                 title=form.cleaned_data.get("title"),
                 start_date=form.cleaned_data.get("start_date"),
                 stop_date=form.cleaned_data.get("stop_date"),
-
-                # Tolu, There is an issue here , Kindly Check and Rectify
-                # polls_option=Poll.polls_option[form.cleaned_data["polls_option1"]]=0,
-                # polls_option=Poll.polls_option[form.cleaned_data["polls_option2"]]=0,
-                # polls_option=Poll.polls_option[form.cleaned_data["polls_option3"]]=0,
-                # polls_option=Poll.polls_option[form.cleaned_data["polls_option4"]]=0,
+                # poll_option=poll_option["poll_1"]=[],
+                # poll_option=poll_option["poll_2"]=[],
+                # poll_option=poll_option["poll_3"]=[],
+                # poll_option=poll_option["poll_4"]=[],
             )
+
             new_poll.save()
-
-            notification = Notification.objects.create(
-                title=f"Poll created by{new_poll.creator.username}",
-                group=Group.objects.get(id=id),
-                content=f'{form.cleaned_data.get("title")}',
-
-            )
-
-            for members in new_poll.group.member_set.all():
-                notification.user.add(members.member)
-            notification.save()
 
             messages.success(request, "Polls created successfully !")
             return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -187,36 +200,53 @@ def create_polls(request, pk, id):
     context = {
 
     }
-    return render(request, "groups/create_polls.html", context)
+
+    return
 
 
-@login_required(login_url="accounts:sign_in")
-def polls_option1(request, pk, id, _id):
+def poll_option_1(request, pk, id, _id):
     poll = Poll.objects.get(id=_id)
-    poll.polls_option_1.add(User.objects.get(id=pk))
-    poll.save()
+    if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
+            "poll_3"] and pk not in poll.polls_option["poll_4"]:
+        poll.polls_option["poll_1"].append(pk)
+        poll.save()
+        messages.success(request, "Vote recorded successfully")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    messages.error(request, "You have voted before")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@login_required(login_url="accounts:sign_in")
-def polls_option2(request, pk, id, _id):
+def poll_option_2(request, pk, id, _id):
     poll = Poll.objects.get(id=_id)
-    poll.polls_option_2.add(User.objects.get(id=pk))
-    poll.save()
+    if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
+            "poll_3"] and pk not in poll.polls_option["poll_4"]:
+        poll.polls_option["poll_2"].append(pk)
+        poll.save()
+        messages.success(request, "Vote recorded successfully")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    messages.error(request, "You have voted before")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@login_required(login_url="accounts:sign_in")
-def polls_option3(request, pk, id, _id):
+def poll_option_3(request, pk, id, _id):
     poll = Poll.objects.get(id=_id)
-    poll.polls_option_3.add(User.objects.get(id=pk))
-    poll.save()
+    if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
+            "poll_3"] and pk not in poll.polls_option["poll_4"]:
+        poll.polls_option["poll_3"].append(pk)
+        poll.save()
+        messages.success(request, "Vote recorded successfully")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    messages.error(request, "You have voted before")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@login_required(login_url="accounts:sign_in")
-def polls_option4(request, id, _id):
+def poll_option_4(request, pk, id, _id):
     poll = Poll.objects.get(id=_id)
-    poll.polls_option_4.add(User.objects.get(id=pk))
-    poll.save()
+    if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
+            "poll_3"] and pk not in poll.polls_option["poll_4"]:
+        poll.polls_option["poll_4"].append(pk)
+        poll.save()
+        messages.success(request, "Vote recorded successfully")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+    messages.error(request, "You have voted before")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

@@ -4,7 +4,12 @@
   <div class="mx-auto p-4 w-full flex flex-col">
 <div class="flex flex-col">
   <h3 class="text-xs text-gray-500">{{members.count}} members available </h3>
-    <h2 class = "font-bold text-xl">{{group.name_of_group}}</h2>
+
+     <span  class="flex gap-2 ">
+  <h2 class = "font-bold text-xl">{{group.name_of_group}}</h2>
+     <a href="{% url 'groups:exit_group' request.user.id group.id %}" title="Exit Group" class="pt-1"><i class="fa fa-sign-out"></i></a>
+   </span>
+
     <p>{{group.title}}</p>
   <small claas="opacity-50 text-gray-300 text-xs"> by {{group.owner}}</small>
 </div>
@@ -34,6 +39,7 @@
           {% endif %}
       </div>
       <div class="space-y-4 mt-4">
+
         {% for post in posts %}
           <div class="bg-gray-100 p-2">
             <div class="flex justify-between space-x-2">
@@ -47,6 +53,9 @@
             <h3 class="p-2">{{ post.body|striptags|truncatechars:200 }}</h3>
             <div class="flex items-center justify-end gap-4">
               <a href="{% url 'groups:like_post' request.user.id group.id post.id   %}"><i class="fa fa-heart-o"></i></a>
+
+<!--              <small>{{post.likes_set.all.count}} likes</small>-->
+
               {% if request.user in group_admin %}
               <i class="fa fa-eye-slash"></i>
               {% endif %}
@@ -74,7 +83,7 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
               <a href="#" class="block focus:outline-none">
-                <span class="absolute inset-0" aria-hidden="true"></span>
+
                 <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
                 <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
               </a>
@@ -93,28 +102,109 @@
     <div id="Event" class="tabcontent">
       <div class="flex">
         <h3 class="text-2xl font-bold p-4">Events</h3>
-        <a>
+
+
+        {% if check_member.is_admin %}
+        <a href="{% url 'activities:create_event' request.user.id group.id %}">
         <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create An Event</button>
         </a>
+        {% endif %}
       </div>
 
       <ul role="list" class="divide-y divide-gray-200">
+        {% for event in events %}
+        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+          <div class="flex justify-between space-x-3">
+            <div class="min-w-0 flex-1">
+              <span class="block focus:outline-none">
+                <p class="text-sm font-medium text-gray-900 truncate">{{event.event.creator}}</p>
+                <p class="text-sm text-gray-500 truncate">{{event.event.title}}</p>
+              </span>
+            </div>
+            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">{{event.event.date_created | timesince}} ago</time>
+          </div>
+          <div class="mt-1">
+            <p class="line-clamp-2 text-sm text-gray-600">{{event.event.description}}</p>
+          </div>
+
+           <a href="{% url 'activities:accept_invite' request.user.id group.id event.event.id event.id  %}">
+          <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
+
+                      Yes
+          </button>
+           </a>
+
+
+           <a href="{% url 'activities:maybe_invite' request.user.id group.id event.event.id event.id  %}">
+          <button  class="flex-shrink-0 whitespace-nowrap text-sm text-yellow-500" type="submit">
+                      Maybe
+          </button>
+           </a>
+
+
+            <a href="{% url 'activities:reject_invite' request.user.id group.id event.event.id event.id  %}">
+              <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
+                No
+              </button>
+            </a>
+        </li>
+        {% empty %}
+        <p>No Event Created Yet</p>
+        {% endfor %}
+      </ul>
+
+
+      <br>
+      <br>
+      {% if check_member.is_admin %}
+       <div class="flex">
+        <h3 class="text-2xl font-bold p-4">List of Events (Admin View)</h3>
+      </div>
+
+
+      <ul role="list" class="divide-y divide-gray-200">
+        {% for event in group_events %}
+
         <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
               <a href="#" class="block focus:outline-none">
-                <span class="absolute inset-0" aria-hidden="true"></span>
-                <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
-                <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
+
+
+                <p class="text-sm font-medium text-gray-900 truncate">{{event.creator}}</p>
+                <p class="text-sm text-gray-500 truncate">{{event.title}}</p>
               </a>
             </div>
-            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">1d ago</time>
+            <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">{{event.date_created | timesince}} ago</time>
           </div>
           <div class="mt-1">
-            <p class="line-clamp-2 text-sm text-gray-600">Doloremque dolorem maiores assumenda dolorem facilis. Velit vel in a rerum natus facere. Enim rerum eaque qui facilis. Numquam laudantium sed id dolores omnis in. Eos reiciendis deserunt maiores et accusamus quod dolor.</p>
+            <p class="line-clamp-2 text-sm text-gray-600">{{event.description}}</p>
           </div>
+
+          <br>
+          <br>
+          <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
+            <a href="{% url 'activities:edit_event' request.user.id group.id event.id  %}">
+                      Update Event
+            </a>
+          </button>
+
+            <br>
+            <br>
+            <h3>Yes - {{event.yes.count}}</h3>
+            <h3>No - {{event.no.count}}</h3>
+            <h3>Maybe - {{event.maybe.count}}</h3>
+
         </li>
+        <br>
+        {% empty %}
+        <p>No Event Created Yet</p>
+        {% endfor %}
       </ul>
+
+      {% endif %}
+        </div>
+
     </div>
 
     <div id="Notification" class="tabcontent">
@@ -164,35 +254,39 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
 <!--              <a href="#" class="block focus:outline-none">-->
-                <span class="absolute inset-0" aria-hidden="true"></span>
+
                 <p class="text-sm font-medium text-gray-900 truncate">{{member.member.full_name}}</p>
                 <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
 <!--              </a>-->
             </div>
-            {% if check_member.is_admin  %}
-              <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
-            <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
-              Remove
-            </a>
-              </button>
 
-                {% if not member.is_suspended %}
-                <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
-                  <a href="{% url 'groups:suspend_member' request.user.id group.id member.member.id  %}">
-                    Suspend
-                  </a>
-                    </button>
-
-
-                    {% if not member.is_admin %}
-                    <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
-                     <a href="{% url 'groups:make_admin' request.user.id group.id member.id %}">
-                   Make Admin
+              {% if member.member.id != group.owner.id and request.user.id != member.member.id%}
+                  {% if check_member.is_admin  %}
+                      <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
+                    <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
+                      Remove
                     </a>
-                    </button>
-                    {% endif %}
-                {% endif %}
-            {% endif %}
+                      </button>
+
+                      {% if not member.is_suspended %}
+                        <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
+                          <a href="{% url 'groups:suspend_member' request.user.id group.id member.member.id  %}">
+                            Suspend
+                          </a>
+                            </button>
+
+
+                          {% if not member.is_admin and check_member.is_admin %}
+                            <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
+                             <a href="{% url 'groups:make_admin' request.user.id group.id member.id %}">
+                           Make Admin
+                            </a>
+                            </button>
+                          {% endif %}
+                      {% endif %}
+                  {% endif %}
+             {% endif %}
+
           </div>
           <div class="mt-1">
 
@@ -205,7 +299,8 @@
             {% if member.is_admin %}
             <p class="line-clamp-2 text-sm text-gray-600">Admin</p>
               {% if request.user.id == group.owner.id and request.user.id != member.member.id %}
-                <a href="{% url 'groups:remove_as_admin' request.user.id group.id member.id %}">
+                <a href="{% url 'groups:remove_as_admin' request.user.id group.id member.member.id %}">
+
                   <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Remove Admin</button>
                 </a>
               {% endif %}
@@ -219,6 +314,7 @@
       </ul>
 
 
+{% comment %} <<<<<<< HEAD
 
       <h3 class="text-2xl font-bold p-4">Suspended Members</h3>
       <ul role="list" class="divide-y divide-gray-200">
@@ -254,6 +350,44 @@
         <p>No suspended members Yet, You can do Better !</p>
         {% endfor %}
       </ul>
+======= {% endcomment %}
+      {% if check_member.is_admin %}
+        <h3 class="text-2xl font-bold p-4">Suspended Members</h3>
+        <ul role="list" class="divide-y divide-gray-200">
+          {% for member in suspended_members %}
+          <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+            <div class="flex justify-between space-x-3">
+              <div class="min-w-0 flex-1">
+  <!--              <a href="#" class="block focus:outline-none">-->
+
+                  <p class="text-sm font-medium text-gray-900 truncate">{{member.member.full_name}}</p>
+                  <p class="text-sm text-gray-500 truncate">{{member.member.username}}</p>
+  <!--              </a>-->
+              </div>
+              {% if check_member.is_admin %}
+              <a href="{% url 'groups:remove_member' request.user.id group.id member.member.id  %}">
+                <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Remove</button>
+              </a>
+
+              <a href="{% url 'groups:unsuspend_member' request.user.id group.id member.member.id  %}">
+                <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">Unsuspend</button>
+              </a>
+              {% endif %}
+            </div>
+            <div class="mt-1">
+
+              <br>
+              {% if member.is_admin %}
+              <p class="line-clamp-2 text-sm text-gray-600">Admin</p>
+              {% endif %}
+            </div>
+          </li>
+          {% empty %}
+          <p>No suspended members Yet, You can do Better !</p>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
 
 
 

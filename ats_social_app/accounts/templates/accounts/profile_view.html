@@ -67,11 +67,19 @@
          {% if a_creator %}
          <div>
              <h3>Group Request</h3>
+{% comment %} <<<<<<< HEAD
              <h5>{{ user_notifications.count }}</h5>
              {% for g_request in requests %}
              <p>{{g_request.request_message}}</p>
              <a href="{% url 'groups:accept_closed_group' request.user.id g_request.group.id %}"><button type="submit">Accept</button></a>
              <a href="{% url 'groups:reject_closed_group' request.user.id g_request.group.id %}"><button type="submit">Reject</button></a>
+======= {% endcomment %}
+             <h5>{{ requests.count }}</h5>
+             {% for g_request in requests %}
+             <p>{{g_request.request_message}}</p>
+             <a href="{% url 'groups:accept_closed_group' request.user.id g_request.id %}"><button type="submit">Accept</button></a>
+             <a href="{% url 'groups:reject_closed_group' request.user.id g_request.id %}"><button type="submit">Reject</button></a>
+{% comment %} >>>>>>> 291b9f87a44dd29961d1064a84febb80b321f7b0 {% endcomment %}
              {% empty %}
              <p>No Group Request Yet</p>
              {% endfor %}

@@ -82,7 +82,7 @@
                                 alt=""/> {% endcomment %}
                         </div>
                         <div class="flex-1">
-                            <form id="comment_form" class="relative" onsubmit="{% url 'groups:add_comment' request.user.id post.id %}"
+                            <form id="comment_form" class="relative" method="POST" action="{% url 'groups:add_comment' request.user.id post.id %}"
                                 method="post">
                                 {% csrf_token %}
                                 <div
