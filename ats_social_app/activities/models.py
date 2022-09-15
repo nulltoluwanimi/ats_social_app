@@ -52,7 +52,7 @@ class Event(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     time_start = models.DateTimeField(null=True)
     time_end = models.DateTimeField(null=True)
-    location = models.CharField(max_length=100, null=True, blank=True)
+    location = models.CharField(max_length=100, null=True)
     is_started = models.BooleanField(default=False)
     yes = models.JSONField(default=_json_list(), null=True, blank=True)
     no = models.JSONField(default=_json_list(), null=True, blank=True)

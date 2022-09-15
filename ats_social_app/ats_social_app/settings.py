@@ -151,6 +151,11 @@ AUTH_USER_MODEL = "accounts.User"
 PHONENUMBER_DB_FORMAT = "INTERNATIONAL"
 PHONENUMBER_DEFAULT_FORMAT = "INTERNATIONAL"
 
+LOGIN_REDIRECT_URL = "/"
+
+
+CAL_ID = "6c67cjbr099g280mkub1ottibk@group.calendar.google.com"
+
 customColorPalette = [
     {"color": "hsl(4, 90%, 58%)", "label": "Red"},
     {"color": "hsl(340, 82%, 52%)", "label": "Pink"},

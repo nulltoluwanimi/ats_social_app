@@ -29,6 +29,8 @@ def create_event(request, pk, id):
             event = form.save(commit=False)
             event.creator = User.objects.get(id=pk)
             event.group = Group.objects.get(id=id)
+            event.time_start = request.POST.get("time_start")
+            event.time_end = request.POST.get("time_end")
             event.save()
 
             notification = Notification.objects.create(
