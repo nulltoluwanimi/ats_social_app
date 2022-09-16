@@ -10,6 +10,7 @@ from .forms import EventCreateForm, PollForms
 from .models import Event, Notification, Poll, EventInvite
 from accounts.models import User
 from groups.models import Group, Members
+from helpers.second_signal import create_event_signal
 
 
 # Create your views here.
@@ -29,9 +30,28 @@ def create_event(request, pk, id):
             event = form.save(commit=False)
             event.creator = User.objects.get(id=pk)
             event.group = Group.objects.get(id=id)
-            event.time_start = request.POST.get("time_start")
-            event.time_end = request.POST.get("time_end")
+            # event.time_start = event.time_start.isoformat()
+            # event.time_end = event.time_end.isoformat()
             event.save()
+
+            for all_members in event.group.members_set.filter(is_suspended=False):
+                event_invite = EventInvite.objects.create(
+                    member=all_members,
+                    event=event
+
+                )
+                event_invite.save()
+
+            print(event.time_end)
+            print(event.time_start)
+
+            for_calendar = {
+                "description": event.description,
+                "title": event.title,
+                "time_start": event.time_start,
+                "time_end": event.time_end,
+            }
+            create_event_signal(request, **for_calendar)
 
             notification = Notification.objects.create(
                 title=f"{event.group}'s event creation",
@@ -44,14 +64,6 @@ def create_event(request, pk, id):
             for members in event.group.members_set.filter(is_admin=True, is_suspended=False):
                 notification.user.add(members.member)
             notification.save()
-
-            for all_members in event.group.members_set.filter(is_suspended=False):
-                event_invite = EventInvite.objects.create(
-                    member=all_members,
-                    event=event
-
-                )
-                event_invite.save()
 
             messages.success(request, "Event Created Successfully")
             return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
@@ -103,6 +115,7 @@ def accept_invite(request, pk, id, _id, __id):
         messages.error(request, "You have already accepted the invite")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     event.yes.append(pk)
+    print(event.time_start)
     event.save()
     event_invite = EventInvite.active_objects.get(id=__id)
     event_invite.is_active = False

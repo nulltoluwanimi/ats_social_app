@@ -78,15 +78,22 @@ class Event(models.Model):
     def for_maybe(self):
         return len(self.maybe)
 
+    def __str__(self):
+        return self.title
+
 
 class EventInvite(models.Model):
     member = models.ForeignKey(Members, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    # date_created = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
     active_objects = ActiveManager()
     inactive_objects = InactiveManager()
+
+    # class Meta:
+    #     ordering = ("-date_created",)
 
 
 class Poll(models.Model):

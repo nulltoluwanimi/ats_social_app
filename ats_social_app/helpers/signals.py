@@ -18,7 +18,7 @@ def get_service(refresh=False):
     # )
     # # or if you have a file
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        filename="service-account.json", scopes=SCOPES
+        filename="service_account.json", scopes=SCOPES
     )
     service = build("calendar", "v3", credentials=credentials)
     return service

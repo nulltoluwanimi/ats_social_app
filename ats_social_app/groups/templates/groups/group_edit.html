@@ -275,7 +275,7 @@
 
                           {% if not member.is_admin and check_member.is_admin %}
                             <button class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">
-                             <a href="{% url 'groups:make_admin' request.user.id group.id member.id %}">
+                             <a href="{% url 'groups:make_admin' request.user.id group.id member.member.id %}">
                            Make Admin
                             </a>
                             </button>
