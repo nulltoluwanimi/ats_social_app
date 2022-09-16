@@ -127,15 +127,43 @@
 
                                 <span class=" bg-white text-sm font-medium text-indigo-900">{{comment.member.member}}</span>
                                 <span class="text-grey-200 text-xs font-medium">
-                                    ({{comment.date_created|timesince}})</span><br>
-                                <span class="text-grey-200  text-base font-medium">{{comment.content}}</span>
+                                    {{comment.date_created|timesince}}</span><br>
+                                   <div class="flex flex-col justify-between"> 
+                                       <span class="text-grey-200  text-base font-medium">{{comment.content}}</span>
+                                       <div class="flex gap-2 ">
+                                        {% if comment.id in liked_comments %}
+                                       <a href="{% url 'groups:like_comment' request.user.id comment.member.group_id comment.id   %}"><i class="fa fa-heart  text-xs" ></i></a>
+                                       {% else %}
+                                       <a href="{% url 'groups:like_comment' request.user.id comment.member.group_id comment.id   %}"><i class="fa fa-heart-o  text-xs" ></i></a>
+                                       {% endif %}      
+                                       <span id="reply-toggle"><i class="fa fa-comments-o  text-xs" ></i></span>
+                                       </div>
+                                       <div class="flex flex-col justify-end mx-auto">
+                                       {% for reply in comment.replies_set.all %}
+                                       <p class="text-xs opacity-50">{{reply.member}}, {{reply.date_created|timesince}}</p>
+                                       <p class="text-sm ">{{reply.content}}</p>
+                                       {% empty %}
+                                       <p class="text-sm opacity-50">No replies Yet</p>
+                                       {% endfor %}
+                                       </div>
+                                       <div class="hidden " id="reply-input" >
+                                        <div class="mt-1 mb-1 w-1/2 border-b border-gray-300 focus-within:border-indigo-600">
+                                            <form id="reply-form" method="POST" action="{% url 'groups:create_reply' request.user.id comment.member.group_id comment.id %}">
+                                                {% csrf_token %}
+                                               <div class="flex"> 
+                                          <input type="text" name="content" id="content" class="block  p-1 border-0 border-b border-transparent  focus:border-indigo-600 focus:ring-0 sm:text-sm" placeholder="reply to comment">
+                                          <button type="submit" name="submit" value="submit" ><i class="fa fa-paper-plane-o opacity-50 text-xs">   </i></button>
+                                               </div>
+                                            </form>
+                                        </div>
+                                      </div>
+                                   </div>
 
                             </li>
                             {% empty %}
                             <div> No Comment yet for this post </div>
                             {% endfor %}
                         </ul>
- 
                     </div>
 
                 </div>
@@ -146,6 +174,16 @@
 
 <script>
     console.log('I am in scripts')
+
+    const reply_toggle = document.getElementById('reply-toggle');
+    const reply_input = document.querySelectorAll('#reply-input')
+    console.log(reply_toggle,reply_input)
+    reply_input.forEach((element)=>{
+        element.style.display = 'block'
+    }) 
+    {% comment %} reply_toggle.addEventListener('click', ()=>{
+      
+    }) {% endcomment %}
     {% comment %} function formSubmit() {
         const form = new FormData();
         const value = document.getElementById('comment').value

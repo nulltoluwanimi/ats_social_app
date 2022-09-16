@@ -1,28 +1,49 @@
-<div>
-  <h3 class="text-2xl font-bold p-4">Polls</h3>
-  <div class="mx-12">
-    <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Polls Question</label>
-    <input type="text" id="" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
-    <p id="helper-text-explanation" class="mt-2 text-sm text-black dark:text-gray-400">This is the polls question</p>
-  </div>
-  <h3 class="text-base font-bold p-4">Polls Options</h3>
-  <h3 class="text-sm opacity-50 font-bold p-4">* The options provided will be displayed to the users</h3>
-  <h3 class="text-sm opacity-50 font-bold p-4">* not all options are required</h3>
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block content %}
+  <div>
+    <h3 class="text-2xl font-bold p-4 mx-auto">Polls</h3>
+    {{ request.kwargs}}
+    <form class="container" method="POST" action="{% url 'activities:create_polls' request.user.id group %}">
+      {% csrf_token %}
+      <div class="mx-12">
+        <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Polls Question</label>
+        <input type="text" id="title" name="title" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
+        <p id="helper-text-explanation" class="mt-2 text-sm text-black dark:text-gray-400">This is the polls question</p>
+      </div>
+      <div class="mx-auto p-4 flex">
+        <div>
+          <labe class="font-bold">start date</labe>
+          <input type="datetime-local" name="{{ form.start_date.name }}" />
+        </div>
+        <div>
+          <labe class="font-bold">stop date</labe>
+          <input type="datetime-local" name="{{ form.stop_date.name }}" />
+        </div>
+      </div>
+      <h3 class="text-base font-bold p-2">Polls Options</h3>
+      <h3 class="text-sm opacity-50 font-bold p-2">* The options provided will be displayed to the users</h3>
+      <h3 class="text-sm opacity-50 font-bold p-2">* not all options are required</h3>
 
-  <div class="mx-12">
-    <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">First Option</label>
-    <input type="text" id="" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
+      <div class="mx-12">
+        <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">First Option</label>
+        <input type="text" id="poll_option1" name="{{ form.poll_option1.name }}" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
+      </div>
+      <div class="mx-12">
+        <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Second Question</label>
+        <input type="text" id="poll_option2" name="poll_option2" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
+      </div>
+      <div class="mx-12">
+        <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Third Question</label>
+        <input type="text" id="poll_option3" name="poll_option3" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
+      </div>
+      <div class="mx-12">
+        <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Fourth Question</label>
+        <input type="text" id="poll_option4" name="poll_option4" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
+      </div>
+      <div class="flex justify-center item-center mx-auto">
+        <button class="bg-blue-500 py-2 px-6 m-2 text-white flex justify-self-end" type="submit">Submit</button>
+      </div>
+    </form>
   </div>
-  <div class="mx-12">
-    <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Second Question</label>
-    <input type="text" id="" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
-  </div>
-  <div class="mx-12">
-    <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Third Question</label>
-    <input type="text" id="" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
-  </div>
-  <div class="mx-12">
-    <label for="helper-text" class="block mb-2 text-sm font-medium text-black dark:text-black">Fourth Question</label>
-    <input type="text" id="" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-200 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Poll Question" />
-  </div>
-</div>
+{% endblock %}

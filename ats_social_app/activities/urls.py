@@ -30,20 +30,15 @@ urlpatterns = [
 
     path("<int:pk>/group/<int:id>/create_polls",
          views.create_polls, name="create_polls"),
-    # <<<<<<< HEAD
-    #     path("<int:pk>/group/<int:id>/polls/vote_option_1", views.polls_option1, name="vote_option_1"),
-    #     path("<int:pk>/group/<int:id>/polls/vote_option_2", views.polls_option2, name="vote_option_2"),
-    #     path("<int:pk>/group/<int:id>/polls/vote_option_3", views.polls_option3, name="vote_option_3"),
-    #     path("<int:pk>/group/<int:id>/polls/vote_option_4", views.polls_option4, name="vote_option_4"),
-    # =======
-    path("<int:pk>/group/<int:id>/polls/vote_option_1",
-         views.poll_option_1, name="vote_option_1"),
-    path("<int:pk>/group/<int:id>/polls/vote_option_2",
-         views.poll_option_2, name="vote_option_2"),
-    path("<int:pk>/group/<int:id>/polls/vote_option_3",
-         views.poll_option_3, name="vote_option_3"),
-    path("<int:pk>/group/<int:id>/polls/vote_option_4",
-         views.poll_option_4, name="vote_option_4"),
+
+    path("<int:pk>/group/<int:id>/polls/vote_option",
+         views.poll_option, name="vote_option"),
+    #     path("<int:pk>/group/<int:id>/polls/vote_option_2",
+    #          views.poll_option_2, name="vote_option_2"),
+    #     path("<int:pk>/group/<int:id>/polls/vote_option_3",
+    #          views.poll_option_3, name="vote_option_3"),
+    #     path("<int:pk>/group/<int:id>/polls/vote_option_4",
+    #          views.poll_option_4, name="vote_option_4"),
 
 
 ]

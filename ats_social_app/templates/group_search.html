@@ -3,19 +3,38 @@
 {% block content %}
 
 {% for search_group in list_of_groups %}
+<div class="container p-4 grid grid-cols-3 gap-4 my-4">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-600">Groups Found</h5>
 
-    <p>{{search_group.name_of_group}}</p>
-    <p>{{search_group.creator}}</p>
-    <p>{{search_group.title}}</p>
-    <p>{{search_group.description | truncatechars:40}}</p>
-    <p>created {{ search_group.date_created | timesince}} ago</p>
+    <div class="p-6 mt-8 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+        <p class="text-white text-xs">created by {{search_group.owner}} , {{ search_group.date_created | timesince}} ago</p>
+        <a href="#">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{search_group.name_of_group}}</h5>
+        </a>
+        <p class=" font-normal text-gray-700 dark:text-gray-400">{{search_group.title}}</p>
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{search_group.description | truncatechars:40}}</p>
+        {% if search.group.is_closed %}
+        <a href="{% url 'groups:join_group' request.user.id search_group.id %}" class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white
+         bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 
+         dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Request
+            <svg aria-hidden="true" class="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
+             xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1
+              0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </a>
+        {% else %}
+        <a href="{% url 'groups:join_group' request.user.id search_group.id %}" class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white
+        bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 
+        dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+           Enter
+           <svg aria-hidden="true" class="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1
+             0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+       </a>
+        
+    </div>    
 
-    {% if search.group.is_closed %}
-    <p>Closed</p>
-    <a href="{% url 'groups:join_group' request.user.id search_group.id %}"><p>Request</p></a>
-    {% else %}
-    <p>open</p>
-    <a href="{% url 'groups:join_group' request.user.id search_group.id %}"><p>Join</p></a>
+</div>
     {% endif %}
 
     <br>
