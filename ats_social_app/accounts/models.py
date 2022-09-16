@@ -11,7 +11,8 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True,)
     profile_picture = models.ImageField(
         upload_to='profile_pictures', default="profile_pictures/avatar.svg")
-    phone_number = PhoneNumberField(unique=True, null=True, blank=True)
+    phone_number = PhoneNumberField(unique=True, null=True, blank=True,
+                                    help_text="Enter a valid Phone number, starting with +")
     nationality = models.CharField(max_length=30, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     date_joined = models.DateField(auto_now=True)

@@ -109,9 +109,6 @@ class UserProfile(ListView):
         except:
             group_requests = []
 
-
-
-
         context = super(UserProfile, self).get_context_data()
         context["user"] = self.get_queryset()
         context["groups"] = number_of_groups
@@ -134,10 +131,11 @@ def user_edit_details(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Edit successfully")
+            return HttpResponseRedirect(reverse('accounts:profile', args=(pk,)))
 
         error = (form.errors.as_text()).split('*')
         messages.error(request, error[len(error) - 1])
-        return HttpResponseRedirect(reverse('accounts:profile', args=(pk,)))
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 
