@@ -108,6 +108,10 @@
         <a href="{% url 'activities:create_event' request.user.id group.id %}">
         <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create An Event</button>
         </a>
+
+        <a href="{% url 'activities:event_calendar' request.user.id group.id  %}">
+        <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Calendar view</button>
+        </a>
         {% endif %}
       </div>
 
