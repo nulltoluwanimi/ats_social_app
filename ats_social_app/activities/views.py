@@ -200,7 +200,7 @@ def create_polls(request, pk, id):
             new_poll.save()
 
             messages.success(request, "Polls created successfully !")
-            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
         error = (form .errors.as_text()).split('*')
         messages.error(request, error[len(error)-1])
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

@@ -53,9 +53,9 @@ class Event(models.Model):
     description = models.CharField(max_length=500, null=True)
 
     date_created = models.DateTimeField(auto_now_add=True)
-    time_start = models.DateTimeField(null=True)
-    time_end = models.DateTimeField(null=True)
-    location = models.CharField(max_length=100, null=True, blank=True)
+    time_start = models.DateTimeField()
+    time_end = models.DateTimeField()
+    location = models.CharField(max_length=100, null=True)
     is_started = models.BooleanField(default=False)
 
     yes = models.JSONField(default=_json_list(), null=True, blank=True)
@@ -82,15 +82,22 @@ class Event(models.Model):
     def for_maybe(self):
         return len(self.maybe)
 
+    def __str__(self):
+        return self.title
+
 
 class EventInvite(models.Model):
     member = models.ForeignKey(Members, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    # date_created = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
     active_objects = ActiveManager()
     inactive_objects = InactiveManager()
+
+    # class Meta:
+    #     ordering = ("-date_created",)
 
 
 class Poll(models.Model):

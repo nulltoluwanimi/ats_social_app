@@ -7,8 +7,28 @@
       <form class="" method="POST" enctype="multipart/form-data" action="">
         {% csrf_token %}
         <div class="w-full">
+            <label>Title</label>
+          {{ form.title }}
+            <br>
 
-          {{ form.as_p }}
+            <label>Description</label>
+            {{ form.description }}
+            <br>
+
+            <label>Time Start</label>
+            <input type="datetime-local" name="{{ form.time_start.name }}" placeholder="00:00">
+            <br>
+
+            <label>Time End</label>
+            <input type="datetime-local" name="{{ form.time_end.name }}" placeholder="00:00">
+            <br>
+
+
+            <label>Location</label>
+            {{ form.location }}
+            <br>
+
+
           <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create Event</button>
         </div>
       </form>

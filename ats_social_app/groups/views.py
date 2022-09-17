@@ -468,6 +468,7 @@ def list_of_groups(request):
 
 @login_required(login_url="accounts:sign_in")
 def like_post(request, pk, id, _id):
+    # <<<<<<< HEAD
 
     user = Members.objects.filter(member_id=pk, group_id=id).first()
 
@@ -484,9 +485,12 @@ def like_post(request, pk, id, _id):
         print(e)
         post_like = Likes.objects.create(
             member=Members.objects.filter(member_id=pk, group_id=id).first(), post_id=_id)[0]
+# =======
+#     post_like = Likes.objects.get_or_create(member__member_id=pk, post_id=_id)[0]
+#     print(post_like)
+# >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
 
     post_like.is_active = not post_like.is_active
-    print(post_like.member)
     post_like.save()
 
     if post_like.is_active:
@@ -502,11 +506,15 @@ def like_post(request, pk, id, _id):
 
 @ login_required(login_url="accounts:sign_in")
 def like_comment(request, pk, id, _id):
+    # <<<<<<< HEAD
     user = Members.objects.filter(member_id=pk, group_id=id).first()
     if user.is_suspended:
         messages.error(
             request, "You can't perform that action, please message admin")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+# =======
+#     comment_like = Likes.objects.get_or_create(member__member_id=pk, comment_id=_id)[0]
+# >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
 
     comment_like = Likes.objects.get_or_create(
         member=Members.objects.get(member_id=pk, group_id=id), comment_id=_id, post_id=Comments.objects.get(id=_id).post_id)[0]
@@ -530,6 +538,7 @@ def like_comment(request, pk, id, _id):
 
 @ login_required(login_url="accounts:sign_in")
 def like_reply(request, pk, id, _id):
+
     # <<<<<<< HEAD
     #     reply_like = Likes.objects.get_or_create(
     #         member__member_id=pk, reply_id=_id)[0]
