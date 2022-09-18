@@ -19,7 +19,8 @@
           {% for event in group_events %}
             {
               title: '{{event.title}}',
-              start: '{{ event.time_start.isoformat }}'
+              start: '{{ event.time_start.isoformat }}',
+              end:'{{ event.time_end.isoformat }}',
             },
           {% endfor %}
           ]
