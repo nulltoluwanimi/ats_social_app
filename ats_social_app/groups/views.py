@@ -42,7 +42,8 @@ def group_details(request, pk, id):
     check_member = Members.not_suspended_objects.filter(
         member_id=pk, group_id=id).first()
     notifications = Notification.objects.filter(group_id=id)
-    posts = Posts.objects.filter(group=group)
+    shown_posts = Posts.active_objects.filter(group=group)
+    all_posts = Posts.objects.filter(group=group)
     group_events = Event.objects.filter(group_id=id)
     group_polls = Poll.objects.filter(group_id=id).order_by('start_date')
     list_of_members = Members.not_suspended_objects.filter(group_id=id)
@@ -50,13 +51,13 @@ def group_details(request, pk, id):
     group_admin = Members.objects.filter(is_admin=True)
     try:
         event_invite = EventInvite.active_objects.filter(
-            member_id=check_member.id)
+            member_id=request.user.id)
     except EventInvite.DoesNotExist:
         event_invite = []
 
     context = {
         "group": group,
-        "posts": posts,
+        "posts": shown_posts if not check_member.is_admin else all_posts,
         "events": event_invite,
         "group_events": group_events,
         "group_polls": group_polls,
@@ -66,11 +67,15 @@ def group_details(request, pk, id):
         "check_member": check_member,
         "suspended_members": suspended_members,
         "group_admin": group_admin,
-        "likes": [likes.post_id for likes in check_member.likes_set.all() if likes.is_active],
+        "likes": [likes.post_id for likes in check_member.likes_set.all() if likes.is_active] if check_member is not None else [],
 
     }
 
+    # if check_member is not None:
     return render(request, "groups/group_edit.html", context)
+    # else:
+    #     messages.info(request, "You need to join the group")
+    #     return HttpResponseRedirect(reverse("accounts:home"))
 
 
 @login_required(login_url="accounts:sign_in")
@@ -317,13 +322,16 @@ def join_group(request, pk, id):
                     request, f"You are already a member of {group.name_of_group}")
                 return HttpResponseRedirect(reverse("groups:group", args=[pk, id]))
 
-        member = Members.objects.create(
+        member = Members.objects.get_or_create(
             member=new_member,
             group=group
-        )
+        )[0]
+        member.is_active = True
         member.save()
         messages.success(
             request, f"you have joined '{group.name_of_group}' successfully")
+        print(member.group)
+        print(member.is_active)
         notification = Notification.objects.create(
             group=group,
             title="New Member",
@@ -379,7 +387,10 @@ def exit_group(request, pk, id):
 
     member = Members.active_objects.get(member_id=pk, group_id=id)
     member.is_active = False
-    member.save()
+    try:
+        member.save()
+    except:
+        member.delete()
 
     notification = Notification.objects.create(
         group_id=member.group_id,
@@ -387,11 +398,16 @@ def exit_group(request, pk, id):
     )
 
     notification.save()
-    return HttpResponseRedirect(reverse("groups:home"))
+    return HttpResponseRedirect(reverse("accounts:home"))
 
 
 @login_required(login_url="accounts:sign_in")
 def create_reply(request, pk, id, _id):
+    try:
+        comment_check = Comments.active_objects.get(id=_id)
+    except:
+        messages.info(request, "Comment is hidden")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     user = Members.objects.filter(member_id=pk, group_id=id).first()
     if user.is_suspended:
         messages.error(
@@ -414,7 +430,10 @@ def create_reply(request, pk, id, _id):
 @login_required(login_url="accounts:sign_in")
 def create_comment(request, pk, id):
     print("Creating comment...")
-    user = Members.objects.filter(member_id=pk, group_id=id).first()
+    selected_post = Posts.objects.get(id=id)
+    user = Members.objects.filter(
+        member_id=pk, group_id=selected_post.group_id).first()
+    print(user)
     if user.is_suspended:
         messages.error(
             request, "You can't perform that action, please message admin")
@@ -430,22 +449,31 @@ def create_comment(request, pk, id):
             new_reply.post = Posts.objects.get(id=id)
             new_reply.save()
 
+            print("git _here")
+
             return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 def post_detail(request, pk):
     post = Posts.objects.get(id=pk)
-    comments = Comments.objects.filter(post_id=pk).order_by('-date_created')
+    comments = Comments.active_objects.filter(
+        post_id=pk).order_by('-date_created')
+    all_comments = Comments.objects.filter(
+        post_id=pk).order_by('-date_created')
+    check_member = Members.active_objects.get(
+        member_id=request.user.id, group_id=post.group_id)
     if request.user.is_authenticated:
         liked_comments = Likes.objects.filter(
             Q(comment_id__in=comments) & Q(post_id=pk) & Q(member__member_id=request.user.id))
+
     # replies = Replies.objects.filter(Q)
-    print(liked_comments)
+    print(1, comments)
     context = {
         "post": post,
         # 'photo':request.user.profile_picture.url
         "liked_comments": [likes.comment_id for likes in liked_comments if likes.is_active],
-        "comments": comments
+        "comments": comments if not check_member.is_admin else all_comments,
+        "check_member": check_member,
 
 
     }
@@ -603,12 +631,15 @@ def create_post(request, pk, id):
 
 @login_required(login_url="accounts:sign_in")
 def hide_post(request, pk, id, _id):
-    member = Members.active_objects.get(member__member_id=pk, group_id=id)
+    member = Members.active_objects.get(member_id=pk, group_id=id)
 
     if member.is_admin:
-        post = Posts.active_objects.get(id=_id)
-        post.is_active = False
-        post.save()
+        try:
+            post = Posts.objects.get(id=_id)
+            post.is_active = not post.is_active
+            post.save()
+        except:
+            messages.info(request, "Post does not exists")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.info(request, "You are not allowed to do that")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -616,12 +647,15 @@ def hide_post(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def hide_comment(request, pk, id, _id):
-    member = Members.active_objects.get(member__member_id=pk, group_id=id)
+    member = Members.active_objects.get(member_id=pk, group_id=id)
 
     if member.is_admin:
-        comment = Comments.active_objects.get(id=_id)
-        comment.is_active = False
-        comment.save()
+        try:
+            comment = Comments.objects.get(id=_id)
+            comment.is_active = not comment.is_active
+            comment.save()
+        except:
+            messages.info(request, "Comment does not exists")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.info(request, "You are not allowed to do that")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -629,12 +663,15 @@ def hide_comment(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def hide_reply(request, pk, id, _id):
-    member = Members.active_objects.get(member__member_id=pk, group_id=id)
+    member = Members.active_objects.get(member_id=pk, group_id=id)
 
     if member.is_admin:
-        reply = Replies.active_objects.get(id=_id)
-        reply.is_active = False
-        reply.save()
+        try:
+            reply = Replies.objects.get(id=_id)
+            reply.is_active = not reply.is_active
+            reply.save()
+        except:
+            messages.info(request, "Reply does not exists")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
     messages.info(request, "You are not allowed to do that")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

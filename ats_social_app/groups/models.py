@@ -138,6 +138,7 @@ class Comments(models.Model):
     class Meta:
         verbose_name = 'comment'
         verbose_name_plural = 'comments'
+        ordering = ("-date_created",)
 
     def __str__(self):
         return self.post.title
@@ -157,6 +158,7 @@ class Replies(models.Model):
     class Meta:
         verbose_name = 'replies'
         verbose_name_plural = 'replies'
+        ordering = ("-date_created",)
 
     def __str__(self):
         return self.comment
@@ -180,6 +182,7 @@ class Likes(models.Model):
     class Meta:
         verbose_name = 'like'
         verbose_name_plural = 'likes'
+        ordering = ("-date_created",)
 
     def __str__(self):
         return str(self.member)

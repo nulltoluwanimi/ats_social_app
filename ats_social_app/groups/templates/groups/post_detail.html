@@ -125,7 +125,7 @@
                             {% for comment in comments %}
                             <li class="px-4 py-4 sm:px-0">
 
-                                <span class=" bg-white text-sm font-medium text-indigo-900">{{comment.member.member}}</span>
+                                <span class=" bg-white text-sm font-medium text-indigo-900">{{comment.member.member}} | </span>
                                 <span class="text-grey-200 text-xs font-medium">
                                     {{comment.date_created|timesince}}</span><br>
                                    <div class="flex flex-col justify-between"> 
@@ -135,20 +135,37 @@
                                        <a href="{% url 'groups:like_comment' request.user.id comment.member.group_id comment.id   %}"><i class="fa fa-heart  text-xs" ></i></a>
                                        {% else %}
                                        <a href="{% url 'groups:like_comment' request.user.id comment.member.group_id comment.id   %}"><i class="fa fa-heart-o  text-xs" ></i></a>
-                                       {% endif %}      
+                                       {% endif %}
+                                       
+                                       
+                                       {% if check_member.is_admin %}
+                                       {% if comment.is_active %}
+                                         <a href="{% url 'groups:hide_comment' request.user.id comment.post.group_id comment.id %}"><i class="fa fa-eye-slash"></i></a>
+                                       {% else %}
+                                         <a href="{% url 'groups:hide_comment' request.user.id comment.post.group_id comment.id %}"><i class="fa fa-eye"></i></a>
+                                       {% endif %}
+                                        {% endif %}
+
                                        <span id="reply-toggle"><i class="fa fa-comments-o  text-xs" ></i></span>
                                        </div>
                                        <div class="flex flex-col justify-end mx-auto">
                                        {% for reply in comment.replies_set.all %}
                                        <p class="text-xs opacity-50">{{reply.member}}, {{reply.date_created|timesince}}</p>
                                        <p class="text-sm ">{{reply.content}}</p>
+                                       {% if check_member.is_admin %}
+                                            {% if reply.is_active %}
+                                            <a href="{% url 'groups:hide_reply' request.user.id reply.comment.post.group_id reply.id %}"><i class="fa fa-eye-slash"></i></a>
+                                            {% else %}
+                                            <a href="{% url 'groups:hide_reply' request.user.id reply.comment.post.group_id reply.id %}"><i class="fa fa-eye"></i></a>
+                                            {% endif %}
+                                        {% endif %}
                                        {% empty %}
                                        <p class="text-sm opacity-50">No replies Yet</p>
                                        {% endfor %}
                                        </div>
                                        <div class="hidden " id="reply-input" >
                                         <div class="mt-1 mb-1 w-1/2 border-b border-gray-300 focus-within:border-indigo-600">
-                                            <form id="reply-form" method="POST" action="{% url 'groups:create_reply' request.user.id comment.member.group_id comment.id %}">
+                                            <form id="reply-form" method="POST" action="{% url 'groups:create_reply' request.user.id comment.post.group_id comment.id %}">
                                                 {% csrf_token %}
                                                <div class="flex"> 
                                           <input type="text" name="content" id="content" class="block  p-1 border-0 border-b border-transparent  focus:border-indigo-600 focus:ring-0 sm:text-sm" placeholder="reply to comment">

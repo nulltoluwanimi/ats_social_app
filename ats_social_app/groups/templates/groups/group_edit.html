@@ -59,10 +59,14 @@
                 <a href="{% url 'groups:like_post' request.user.id group.id post.id    %}"><i class="fa fa-heart-o " ></i></a>
               {% endif %}
 
-              {% if request.user in group_admin %}
-              <i class="fa fa-eye-slash"></i>
+              {% if check_member.is_admin %}
+                {% if post.is_active %}
+                  <a href="{% url 'groups:hide_post' request.user.id group.id post.id %}"><i class="fa fa-eye-slash"></i></a>
+                {% else %}
+                  <a href="{% url 'groups:hide_post' request.user.id group.id post.id %}"><i class="fa fa-eye"></i></a>
+                {% endif %}
               {% endif %}
-              <i class="fa fa-share-alt"></i>
+              {% comment %} <i class="fa fa-share-alt"></i> {% endcomment %}
               <span class="flex gap-2"><i class="fa fa-comments-o"></i></span>
             </div>
           </div>
@@ -72,6 +76,7 @@
       </div>
     </div>
 
+    
     <div id="Polls" class="tabcontent">
       <div class="flex">
         <h3 class="text-2xl font-bold p-4">Polls</h3>
@@ -87,7 +92,7 @@
           <div class="flex justify-between space-x-3">
             <div class="min-w-0 flex-1">
               <a href="#" class="block focus:outline-none">
-                {% comment %} <p class="text-sm font-medium text-gray-900 truncate">starts on {{poll.start_date}} - ends on {{poll.stop_date}}</p> {% endcomment %}
+                <p class="text-sm font-medium text-gray-900 truncate">starts on {{poll.start_date}} - ends on {{poll.stop_date}}</p>
                 <p class="text-lg font-semibold text-gray-900 truncate">{{poll.title}}</p>
               </a>
               <form  method="POST" action="{% url 'activities:vote_option' request.user.id poll.id %}">
@@ -100,8 +105,10 @@
                     dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                 </div>
                 <div class="ml-2 text-sm flex  ">
-                    <label for="helper-radio" class="font-medium text-gray-600 text-base ">{{option}}</label>
+                  <label for="helper-radio" class="font-medium text-gray-600 text-base ">{{option}}</label>
+                  {% if check_member.is_admin %}
                     <p id="helper-radio-text" class="text-sm font-bold text-gray-400 ml-12 item-right ">{{ value|length|percentage:no_of_members }}%</p>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -126,17 +133,24 @@
       <div class="flex">
         <h3 class="text-2xl font-bold p-4">Events</h3>
 
-
         {% if check_member.is_admin %}
         <a href="{% url 'activities:create_event' request.user.id group.id %}">
         <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Create An Event</button>
         </a>
 
-        <a href="{% url 'activities:event_calendar' request.user.id group.id  %}">
+        {% comment %} {% if events.count > 0 %} {% endcomment %}
+         <a href="{% url 'activities:event_calendar' request.user.id group.id  %}">
         <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit">Calendar view</button>
-        </a>
+        </a> 
+        {% comment %} {% endif %} {% endcomment %}
         {% endif %}
       </div>
+
+      {% comment %} <div class="tab">
+        <button class="tablinks" onclick="openCity(event, 'Post')">List View</button>
+        <button class="tablinks" onclick="openCity(event, 'Polls')">Calender View</button>
+
+      </div> {% endcomment %}
 
       <ul role="list" class="divide-y divide-gray-200">
         {% for event in events %}

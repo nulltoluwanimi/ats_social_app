@@ -62,6 +62,13 @@ def create_event(request, pk, id):
     return render(request, "groups/create_event.html", context)
 
 
+def calendar_event_view(request, pk, id):
+    context = {
+        "group_events": Event.objects.filter(group_id=id)
+    }
+    return render(request, "groups/event_calendar.html", context)
+
+
 @login_required(login_url="accounts:sign_in")
 def edit_event(request, pk, id, _id):
     event = Event.running_objects.get(id=_id)

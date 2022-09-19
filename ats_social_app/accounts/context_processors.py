@@ -12,7 +12,7 @@ def context(request):
             '-date_created')[:5]
         context['open_events'] = Event.objects.filter(
             group__is_closed=False)[:4]
-        context['open_posts'] = Posts.objects.filter(
+        context['open_posts'] = Posts.active_objects.filter(
             group__is_closed=False)
         context['all_groups'] = Group.objects.all().order_by(
             '-date_created')[:10]
