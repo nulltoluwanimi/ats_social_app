@@ -13,6 +13,10 @@
 
     <p>{{group.title}}</p>
   <small claas="opacity-50 text-gray-300 text-xs"> by {{group.owner}}</small>
+
+    {% if check_member.is_admin %}
+    <a href="{% url 'groups:edit_group_details' group.id %}"><i class="fa fa-cogs" style="font-size:24px"></i></a>
+    {% endif %}
 </div>
 
   {% if group.picture %}
@@ -39,7 +43,7 @@
         <button class="bg-blue-500 py-4 px-4 m-2 text-white" type="submit"><a href="{% url 'groups:create_post' request.user.id group.id %}">Create A Post</a></button>
           {% endif %}
       </div>
-      <div class="space-y-4 mt-4">
+      <div class="space-y-4 mt-4">``
 
         {% for post in posts %}
           <div class="bg-gray-100 p-2">
@@ -76,7 +80,7 @@
       </div>
     </div>
 
-    
+    {% if not check_member.is_suspended %}
     <div id="Polls" class="tabcontent">
       <div class="flex">
         <h3 class="text-2xl font-bold p-4">Polls</h3>
@@ -125,9 +129,60 @@
  
         </li>
 
-{% endfor %}
+        {% endfor %}
       </ul>
+
+
+
+        {% if check_member.is_admin %}
+       <div class="flex">
+        <h3 class="text-2xl font-bold p-4">List of Polls (Admin View)</h3>
+      </div>
+
+
+      <ul role="list" class="divide-y divide-gray-200">
+        {% for poll in all_polls %}
+
+        <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+          <div class="flex justify-between space-x-3">
+            <div class="min-w-0 flex-1">
+
+
+
+                <p class="text-sm font-medium text-gray-900 truncate">{{poll.creator}}</p>
+                <p class="text-sm text-gray-500 truncate">{{poll.title}}</p>
+
+            </div>
+            <p class="text-sm font-medium text-gray-900 truncate">starts on {{poll.start_date}} - ends on {{poll.stop_date}}</p>
+          </div>
+          <div class="mt-1">
+            <p class="line-clamp-2 text-sm text-gray-600">{{poll.description}}</p>
+          </div>
+
+
+
+          <br>
+          <br>
+            {% comment %}
+<!--          <button  class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500" type="submit">-->
+<!--            <a href="{% url 'activities:edit_event' request.user.id group.id e.id  %}">-->
+<!--                      Update Event-->
+<!--            </a>-->
+<!--          </button>-->
+            {% endcomment %}
+
+
+
+        </li>
+        <br>
+        {% empty %}
+        <p>No Polls Created Yet</p>
+        {% endfor %}
+      </ul>
+
+      {% endif %}
     </div>
+    {% endif %}
 
     <div id="Event" class="tabcontent">
       <div class="flex">
@@ -190,7 +245,7 @@
             </a>
         </li>
         {% empty %}
-        <p>No Event Created Yet</p>
+        <p>No Event at the moment</p>
         {% endfor %}
       </ul>
 
@@ -204,7 +259,7 @@
 
 
       <ul role="list" class="divide-y divide-gray-200">
-        {% for event in group_events %}
+        {% for event in all_events %}
 
         <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
           <div class="flex justify-between space-x-3">
@@ -221,6 +276,8 @@
           <div class="mt-1">
             <p class="line-clamp-2 text-sm text-gray-600">{{event.description}}</p>
           </div>
+
+            <p>{{event.time_start}} --- {{event.time_end}}</p>
 
           <br>
           <br>
@@ -356,7 +413,7 @@
       </ul>
 
 
-{% comment %} <<<<<<< HEAD
+{% comment %}
 
       <h3 class="text-2xl font-bold p-4">Suspended Members</h3>
       <ul role="list" class="divide-y divide-gray-200">
@@ -392,7 +449,7 @@
         <p>No suspended members Yet, You can do Better !</p>
         {% endfor %}
       </ul>
-======= {% endcomment %}
+        {% endcomment %}
       {% if check_member.is_admin %}
         <h3 class="text-2xl font-bold p-4">Suspended Members</h3>
         <ul role="list" class="divide-y divide-gray-200">

@@ -1,4 +1,5 @@
-from turtle import pos
+import datetime
+
 from django.shortcuts import render, reverse
 from django.contrib import messages
 from django.db.models import Q
@@ -7,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 
 from accounts.models import User
 from .models import Comments, Group, Posts, Members, Likes, Replies, GroupRequest
-
 from .forms import GroupCreateForm, PostForm, ReplyForm, CommentForm
 from activities.models import Notification, Event, Poll, EventInvite
 
@@ -37,15 +37,16 @@ def group_search(request):
 
 @login_required(login_url="accounts:sign_in")
 def group_details(request, pk, id):
-
     group = Group.objects.get(pk=id)
     check_member = Members.not_suspended_objects.filter(
         member_id=pk, group_id=id).first()
     notifications = Notification.objects.filter(group_id=id)
     shown_posts = Posts.active_objects.filter(group=group)
     all_posts = Posts.objects.filter(group=group)
-    group_events = Event.objects.filter(group_id=id)
-    group_polls = Poll.objects.filter(group_id=id).order_by('start_date')
+    group_events = Event.objects.filter(group_id=id, time_end__gte=datetime.datetime.now().isoformat())
+    all_events = Event.objects.filter(group_id=id)
+    group_polls = Poll.objects.filter(group_id=id, stop_date__gte=datetime.datetime.now().isoformat()).order_by('start_date')
+    all_polls = Poll.objects.filter(group_id=id)
     list_of_members = Members.not_suspended_objects.filter(group_id=id)
     suspended_members = Members.suspended_objects.filter(group_id=id)
     group_admin = Members.objects.filter(is_admin=True)
@@ -60,14 +61,17 @@ def group_details(request, pk, id):
         "posts": shown_posts if not check_member.is_admin else all_posts,
         "events": event_invite,
         "group_events": group_events,
+        "all_events": all_events,
         "group_polls": group_polls,
+        "all_polls": all_polls,
         "members": list_of_members,
         "no_of_members": list_of_members.count(),
         "notifications": notifications,
         "check_member": check_member,
         "suspended_members": suspended_members,
         "group_admin": group_admin,
-        "likes": [likes.post_id for likes in check_member.likes_set.all() if likes.is_active] if check_member is not None else [],
+        "likes": [likes.post_id for likes in check_member.likes_set.all() if
+                  likes.is_active] if check_member is not None else [],
 
     }
 
@@ -76,6 +80,34 @@ def group_details(request, pk, id):
     # else:
     #     messages.info(request, "You need to join the group")
     #     return HttpResponseRedirect(reverse("accounts:home"))
+
+
+@login_required(login_url="accounts:sign_in")
+def group_edit_details(request, id):
+    try:
+        check_member = Members.active_objects.get(member_id=request.user.id, group_id=id)
+        group = Group.objects.get(id=id)
+    except:
+        messages.error(request, "Member does not exist")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+    if not check_member.is_admin:
+        messages.info(request, "You are not permitted to edit the group info")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+    if request.method == "POST":
+        form = GroupCreateForm(request.POST, request.FILES, instance=group)
+
+        if form.is_valid():
+            form.save()
+
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+    context = {
+        "form": GroupCreateForm(instance=group)
+
+    }
+    return render(request, "groups/create_group.html", context)
 
 
 @login_required(login_url="accounts:sign_in")
@@ -189,7 +221,6 @@ def remove_as_admin(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def remove_member_of_group(request, pk, id, _id):
-
     group = Group.objects.get(id=id)
     member = Members.objects.get(member_id=pk, group_id=id)
 
@@ -244,7 +275,6 @@ def suspend_member(request, pk, id, _id):
 
 @login_required(login_url="accounts:sign_in")
 def unsuspend_member(request, pk, id, _id):
-
     group = Group.objects.get(id=id)
     member = Members.objects.get(member_id=pk, group_id=id)
 
@@ -279,7 +309,6 @@ def join_group(request, pk, id):
     if group.is_closed:
         for member in group.members_set.all():
             if member.member_id == pk:
-
                 messages.info(
                     request, f"You are already a member of {group.name_of_group}")
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
@@ -384,7 +413,6 @@ def reject_request_closed_group(request, pk, id):
 
 
 def exit_group(request, pk, id):
-
     member = Members.active_objects.get(member_id=pk, group_id=id)
     member.is_active = False
     try:
@@ -475,7 +503,6 @@ def post_detail(request, pk):
         "comments": comments if not check_member.is_admin else all_comments,
         "check_member": check_member,
 
-
     }
     return render(request, 'groups/post_detail.html', context)
 
@@ -513,10 +540,10 @@ def like_post(request, pk, id, _id):
         print(e)
         post_like = Likes.objects.create(
             member=Members.objects.filter(member_id=pk, group_id=id).first(), post_id=_id)[0]
-# =======
-#     post_like = Likes.objects.get_or_create(member__member_id=pk, post_id=_id)[0]
-#     print(post_like)
-# >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
+    # =======
+    #     post_like = Likes.objects.get_or_create(member__member_id=pk, post_id=_id)[0]
+    #     print(post_like)
+    # >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
 
     post_like.is_active = not post_like.is_active
     post_like.save()
@@ -532,7 +559,7 @@ def like_post(request, pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@ login_required(login_url="accounts:sign_in")
+@login_required(login_url="accounts:sign_in")
 def like_comment(request, pk, id, _id):
     # <<<<<<< HEAD
     user = Members.objects.filter(member_id=pk, group_id=id).first()
@@ -540,12 +567,13 @@ def like_comment(request, pk, id, _id):
         messages.error(
             request, "You can't perform that action, please message admin")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-# =======
-#     comment_like = Likes.objects.get_or_create(member__member_id=pk, comment_id=_id)[0]
-# >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
+    # =======
+    #     comment_like = Likes.objects.get_or_create(member__member_id=pk, comment_id=_id)[0]
+    # >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
 
     comment_like = Likes.objects.get_or_create(
-        member=Members.objects.get(member_id=pk, group_id=id), comment_id=_id, post_id=Comments.objects.get(id=_id).post_id)[0]
+        member=Members.objects.get(member_id=pk, group_id=id), comment_id=_id,
+        post_id=Comments.objects.get(id=_id).post_id)[0]
     print(comment_like.post)
     comment_like.is_active = not comment_like.is_active
     comment_like.save()
@@ -564,9 +592,8 @@ def like_comment(request, pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@ login_required(login_url="accounts:sign_in")
+@login_required(login_url="accounts:sign_in")
 def like_reply(request, pk, id, _id):
-
     # <<<<<<< HEAD
     #     reply_like = Likes.objects.get_or_create(
     #         member__member_id=pk, reply_id=_id)[0]
@@ -589,7 +616,7 @@ def like_reply(request, pk, id, _id):
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-@ login_required(login_url="accounts:sign_in")
+@login_required(login_url="accounts:sign_in")
 def create_post(request, pk, id):
     form = PostForm()
 

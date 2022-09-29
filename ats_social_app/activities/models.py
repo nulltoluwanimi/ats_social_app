@@ -1,5 +1,7 @@
-from email.policy import default
+import datetime
+
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from accounts.models import User
 
@@ -62,10 +64,6 @@ class Event(models.Model):
     no = models.JSONField(default=_json_list(), null=True, blank=True)
     maybe = models.JSONField(default=_json_list(), null=True, blank=True)
 
-    # yes = models.ManyToManyField(User, related_name="event_yes")
-    # no = models.ManyToManyField(User, related_name="event_no")
-    # maybe = models.ManyToManyField(User, related_name="event_maybe")
-
     objects = models.Manager()
     started_objects = StartedEvent()
     running_objects = NotStartedEvent()
@@ -107,17 +105,12 @@ class Poll(models.Model):
                              help_text="Kindly input the question")
     description = models.CharField(max_length=500)
 
-    start_date = models.DateTimeField()
+    start_date = models.DateTimeField(default=datetime.datetime.now, editable=False)
     stop_date = models.DateTimeField()
     poll_option = models.JSONField(
         default=_json(), help_text="Maximum of 4 Options")
 
-    # poll_option_1_tag = models.CharField(max_length=40, null=True, blank=True)
-    # poll_option_2_tag = models.CharField(max_length=40, null=True, blank=True)
-    # poll_option_3_tag = models.CharField(max_length=40, null=True, blank=True)
-    # poll_option_4_tag = models.CharField(max_length=40, null=True, blank=True)
-    #
-    # poll_option_1_count = models.ManyToManyField(User, related_name="poll_1")
-    # poll_option_2_count = models.ManyToManyField(User, related_name="poll_2")
-    # poll_option_3_count = models.ManyToManyField(User, related_name="poll_3")
-    # poll_option_4_count = models.ManyToManyField(User, related_name="poll_4")
+    def save(self, *args, **kwargs):
+        if self.start_date < datetime.datetime.now:
+            raise ValidationError("The date cannot be in the past")
+        super(self, Poll).save(*args, **kwargs)

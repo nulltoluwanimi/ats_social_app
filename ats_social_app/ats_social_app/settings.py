@@ -87,29 +87,26 @@ DATABASES = {
     #     'PORT': '5432',
     # }
 
-    # <<<<<<< HEAD
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'social_App',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'root',
+
+    #     # 'default': {
+    #     #     'ENGINE': 'django.db.backends.postgresql',
+    #     #     'NAME': 'dekau70phfhuuv',
+    #     #     'USER': 'bsimqcibrzhwbx',
+    #     #     'PASSWORD': 'e7c70e2df3a4b8b02c87b8e2cba02e97d4acecbb8806ee10556f20002036cbf1',
+    #     #     'HOST': 'localhost',
+    #     #     'PORT': '5432',
+    #     # }
 
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'social_App',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
-        # =======
-        #     # 'default': {
-        #     #     'ENGINE': 'django.db.backends.postgresql',
-        #     #     'NAME': 'dekau70phfhuuv',
-        #     #     'USER': 'bsimqcibrzhwbx',
-        #     #     'PASSWORD': 'e7c70e2df3a4b8b02c87b8e2cba02e97d4acecbb8806ee10556f20002036cbf1',
-        #     #     'HOST': 'localhost',
-        #     #     'PORT': '5432',
-        #     # }
-
-        #     'default': {
-        #         'ENGINE': 'django.db.backends.postgresql',
-        #         'NAME': 'social_media',
-        #         'USER': 'Django_ATS',
-        #         'PASSWORD': '1234567890',
-        # >>>>>>> ea1c8eaaddf249ae64a56e84922ebcc52fcaa749
+        'NAME': 'social_media',
+        'USER': 'Django_ATS',
+        'PASSWORD': '1234567890',
         'HOST': 'localhost',
         'PORT': '5432',
     }

@@ -207,10 +207,12 @@ def create_polls(request, pk, id):
             new_poll.save()
 
             messages.success(request, "Polls created successfully !")
-
+            return HttpResponseRedirect(reverse("groups:group", args=(request.user.id, id)))
+        print(form.errors)
         error = (form .errors.as_text()).split('*')
         messages.error(request, error[len(error)-1])
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
 
     context = {
         "form": form,
@@ -218,6 +220,16 @@ def create_polls(request, pk, id):
     }
 
     return render(request, 'groups/create_polls.html', context)
+
+
+def edit_polls(request, id):
+    try:
+        event = Event.objects.get(id=id)
+    except:
+        messages.error(request, "Event does not exist")
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+    form = PollForms(instance=event)
 
 
 def poll_option(request, pk,  id):
@@ -260,38 +272,3 @@ def poll_option(request, pk,  id):
         messages.error(request, "An error occurred")
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
-
-# def poll_option_2(request, pk, id, _id):
-#     poll = Poll.objects.get(id=_id)
-#     if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
-#             "poll_3"] and pk not in poll.polls_option["poll_4"]:
-#         poll.polls_option["poll_2"].append(pk)
-#         poll.save()
-#         messages.success(request, "Vote recorded successfully")
-#         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-#     messages.error(request, "You have voted before")
-#     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-
-
-# def poll_option_3(request, pk, id, _id):
-#     poll = Poll.objects.get(id=_id)
-#     if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
-#             "poll_3"] and pk not in poll.polls_option["poll_4"]:
-#         poll.polls_option["poll_3"].append(pk)
-#         poll.save()
-#         messages.success(request, "Vote recorded successfully")
-#         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-#     messages.error(request, "You have voted before")
-#     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-
-
-# def poll_option_4(request, pk, id, _id):
-#     poll = Poll.objects.get(id=_id)
-#     if pk not in poll.polls_option["poll_1"] and pk not in poll.polls_option["poll_2"] and pk not in poll.polls_option[
-#             "poll_3"] and pk not in poll.polls_option["poll_4"]:
-#         poll.polls_option["poll_4"].append(pk)
-#         poll.save()
-#         messages.success(request, "Vote recorded successfully")
-#         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-#     messages.error(request, "You have voted before")
-#     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))

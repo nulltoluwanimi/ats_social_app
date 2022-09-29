@@ -7,6 +7,7 @@ urlpatterns = [
 
     path("<int:pk>/create-group/", views.create_group, name="create-group"),
     path('<int:pk>/group/<int:id>/', views.group_details, name="group"),
+    path("edit_group_details/<int:id>/", views.group_edit_details, name="edit_group_details"),
 
     path('search_group/', views.group_search, name="group_search"),
     path('<int:pk>/group/<int:id>/make_admin/<int:_id>',

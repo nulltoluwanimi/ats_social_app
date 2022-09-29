@@ -2,6 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0d84a30e-ae8d-4a0f-a2cc-09363cd1f59f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ats_social_app/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/activities/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/activities/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/activities/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ats_social_app/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ats_social_app/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/templates/groups/create_event.html" beforeDir="false" afterPath="$PROJECT_DIR$/groups/templates/groups/create_event.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/templates/groups/group_edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/groups/templates/groups/group_edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/groups/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/groups/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/groups/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/groups/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,7 +34,7 @@
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/AbrahamGrahamAdekunl/Desktop/nnn/ats_social_app",
+    "last_opened_file_path": "C:/Users/AbrahamGrahamAdekunl/Desktop/new new/ats_social_app",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
